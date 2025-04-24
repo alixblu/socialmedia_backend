@@ -18,6 +18,8 @@ public class SecurityConfig {
         this.corsFilter = corsFilter;
     }
 
+
+    // Phân quyền cho các endpoint
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http

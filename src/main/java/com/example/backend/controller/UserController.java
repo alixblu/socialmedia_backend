@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import com.example.backend.dto.RegisterDTO;
 
 @RestController
 @RequestMapping("/users")
@@ -55,7 +57,7 @@ public class UserController {
     }
 
 
-    // API của phần Đăng nhập
+    // API của phần Đăng nhập và đăng ký
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody User loginUser) {
         // Tìm người dùng qua email
@@ -68,4 +70,36 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                              .body("Đăng nhập không thành công! Kiểm tra lại email và mật khẩu");
     }
-}
+    @PostMapping("/auth/register")
+    public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT) // 409: dữ liệu bị trùng
+                    .body("Email đã được sử dụng!");
+        }
+    
+        if (userRepository.existsByUsername(request.getUsername())) {
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("Tên người dùng đã tồn tại!");
+        }
+    
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setDateOfBirth(request.getDateOfBirth());
+        user.setCreatedAt(LocalDate.now());
+        user.setIsAdmin(false);
+        user.setAvatarUrl("default-avatar.png");
+    
+        userRepository.save(user);
+    
+        return ResponseEntity
+                .status(HttpStatus.CREATED) // 201: tạo mới thành công
+                .body("Đăng ký thành công!" + user);
+    }
+    
+
+
+}   
