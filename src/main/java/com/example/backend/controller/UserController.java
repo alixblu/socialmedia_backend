@@ -3,12 +3,16 @@ package com.example.backend.controller;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@CrossOrigin(origins = "http://localhost:5173")
+
 public class UserController {
 
     @Autowired
@@ -48,5 +52,20 @@ public class UserController {
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Integer id) {
         userRepository.deleteById(id);
+    }
+
+
+    // API của phần Đăng nhập
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody User loginUser) {
+        // Tìm người dùng qua email
+        User user = userRepository.findByEmail(loginUser.getEmail());
+
+        if (user != null && user.getPassword().equals(loginUser.getPassword())) {
+            return ResponseEntity.ok(user);  // Đăng nhập thành công, trả về người dùng
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                             .body("Đăng nhập không thành công! Kiểm tra lại email và mật khẩu");
     }
 }

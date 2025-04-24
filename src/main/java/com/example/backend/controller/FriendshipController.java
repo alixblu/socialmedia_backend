@@ -14,10 +14,10 @@ public class FriendshipController {
     @Autowired
     private FriendshipRepository friendshipRepository;
 
-    @GetMapping("/user/{userId}")
-    public List<Friendship> getFriendshipsByUser(@PathVariable Integer userId) {
-        return friendshipRepository.findByUserId1OrUserId2(userId, userId);
-    }
+    // @GetMapping("/user/{userId}")
+    // public List<Friendship> getFriendshipsByUser(@PathVariable Integer userId) {
+    //     return friendshipRepository.findByUserId1OrUserId2(userId, userId);
+    // }
 
     @PostMapping
     public Friendship createFriendship(@RequestBody Friendship friendship) {
