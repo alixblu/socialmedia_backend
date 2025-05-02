@@ -34,8 +34,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login", "/auth/register").permitAll()  // Public authentication endpoints
                         .requestMatchers("/public/**").permitAll() // Public API
-                        .requestMatchers("/admin/**").hasRole("ADMIN") // Restricted to ADMIN users
-                        .requestMatchers("/user/**").hasRole("USER") // Restricted to USER role
+                        .requestMatchers("/admin/**").permitAll() //.hasRole("ADMIN") // Restricted to ADMIN users
+                        .requestMatchers("/users", "/users/", "/users/**").permitAll() //.hasRole("USER") // Restricted to USER role
                         .anyRequest().authenticated() // All other requests require authentication
                 )
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class) // Enable CORS

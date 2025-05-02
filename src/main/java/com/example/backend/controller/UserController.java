@@ -28,7 +28,7 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public User getUserById(@PathVariable Integer id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -38,7 +38,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public User updateUser(@PathVariable Integer id, @RequestBody User userDetails) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
@@ -54,7 +54,7 @@ public class UserController {
         return null;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteUser(@PathVariable Integer id) {
         userRepository.deleteById(id);
     }

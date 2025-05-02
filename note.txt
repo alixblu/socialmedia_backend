@@ -1,0 +1,10 @@
+Summary Table
+| Pattern | Matches /users | Matches /users/1 | Matches /users/abc/def |
+|-----------------|:----------------:|:------------------:|:------------------------:|
+| /users | ✔ | ✗ | ✗ |
+| /users/** | ✗ | ✔ | ✔ |
+| /users* | ✔ | ✔* | ✔* |
+\* /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
+
+/users* matches /users, /users/, /users123, etc.
+
