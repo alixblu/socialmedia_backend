@@ -8,7 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.example.backend.dto.RegisterDTO;
 
 @RestController
@@ -56,19 +59,22 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-
-    // API của phần Đăng nhập và đăng ký
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody User loginUser) {
-        // Tìm người dùng qua email
-        User user = userRepository.findByEmail(loginUser.getEmail());
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
 
-        if (user != null && user.getPassword().equals(loginUser.getPassword())) {
-            return ResponseEntity.ok(user);  // Đăng nhập thành công, trả về người dùng
+        User user = userRepository.findByEmail(email);
+
+        if (user != null && user.getPassword().equals(password)) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("email", user.getEmail());
+            response.put("role", user.getIsAdmin() ? "ADMIN" : "USER");  // Assign role
+
+            return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                             .body("Đăng nhập không thành công! Kiểm tra lại email và mật khẩu");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
