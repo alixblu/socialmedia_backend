@@ -2,10 +2,12 @@ package com.example.backend.controller;
 
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -63,18 +65,27 @@ public class UserController {
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
-
+        JwtUtil jwtUtil = new JwtUtil();
         User user = userRepository.findByEmail(email);
 
-        if (user != null && user.getPassword().equals(password)) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("email", user.getEmail());
-            response.put("role", user.getIsAdmin() ? "ADMIN" : "USER");  // Assign role
-
-            return ResponseEntity.ok(response);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is incorrect");
+        }
+
+        // Check if the user is an admin
+        boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email, true);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("email", user.getEmail());
+        response.put("role", isAdmin ? "ADMIN" : "USER");
+        String token = jwtUtil.generateToken(user.getEmail());
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {

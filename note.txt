@@ -1,3 +1,8 @@
+api testing: https://api-spotify-app.postman.co/workspace/Social-Media-Workspace~6cd8477d-62bc-4fac-aa5e-3b4c0d113c89/collection/44415415-56264cb3-279a-455e-94c4-5c51c9c70a53?action=share&creator=44415415
+----generate secret key by terminal
+cd target/classes
+java com.example.backend.security.SecretKeyGenerator
+
 Summary Table
 | Pattern | Matches /users | Matches /users/1 | Matches /users/abc/def |
 |-----------------|:----------------:|:------------------:|:------------------------:|
@@ -7,4 +12,5 @@ Summary Table
 \* /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
 
 /users* matches /users, /users/, /users123, etc.
+
 

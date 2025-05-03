@@ -12,7 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.List;
 
 
 @Configuration
@@ -32,13 +37,12 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF (usually required for REST APIs)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()  // Public authentication endpoints
                         .requestMatchers("/public/**").permitAll() // Public API
                         .requestMatchers("/admin/**").permitAll() //.hasRole("ADMIN") // Restricted to ADMIN users
+                        .requestMatchers("/users/auth/login", "/users/auth/register").permitAll() // Allow login and register
                         .requestMatchers("/users", "/users/", "/users/**").permitAll() //.hasRole("USER") // Restricted to USER role
                         .anyRequest().authenticated() // All other requests require authentication
                 )
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class) // Enable CORS
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT authentication filter
 
         return http.build();

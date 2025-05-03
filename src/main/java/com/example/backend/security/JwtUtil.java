@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,7 +10,8 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private static final String SECRET_KEY = "your_secret_key";  // Change this to a secure key
+    private static final Dotenv dotenv = Dotenv.load();  // ✅ Load .env variables
+    private static final String SECRET_KEY = dotenv.get("JWT_SECRET"); // ✅ Read JWT_SECRET from .env
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
 
     public String generateToken(String username) {
