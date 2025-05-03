@@ -2,13 +2,18 @@ package com.example.backend.controller;
 
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import com.example.backend.dto.RegisterDTO;
 
 @RestController
@@ -25,7 +30,7 @@ public class UserController {
         return userRepository.findAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("{id}")
     public User getUserById(@PathVariable Integer id) {
         return userRepository.findById(id).orElse(null);
     }
@@ -35,7 +40,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("{id}")
     public User updateUser(@PathVariable Integer id, @RequestBody User userDetails) {
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
@@ -51,24 +56,36 @@ public class UserController {
         return null;
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public void deleteUser(@PathVariable Integer id) {
         userRepository.deleteById(id);
     }
 
-
-    // API của phần Đăng nhập và đăng ký
     @PostMapping("/auth/login")
-    public ResponseEntity<?> login(@RequestBody User loginUser) {
-        // Tìm người dùng qua email
-        User user = userRepository.findByEmail(loginUser.getEmail());
+    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
+        String email = loginRequest.get("email");
+        String password = loginRequest.get("password");
+        JwtUtil jwtUtil = new JwtUtil();
+        User user = userRepository.findByEmail(email);
 
-        if (user != null && user.getPassword().equals(loginUser.getPassword())) {
-            return ResponseEntity.ok(user);  // Đăng nhập thành công, trả về người dùng
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
         }
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                             .body("Đăng nhập không thành công! Kiểm tra lại email và mật khẩu");
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is incorrect");
+        }
+
+        // Check if the user is an admin
+        boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email, true);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("email", user.getEmail());
+        response.put("role", isAdmin ? "ADMIN" : "USER");
+        String token = jwtUtil.generateToken(user.getEmail());
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
