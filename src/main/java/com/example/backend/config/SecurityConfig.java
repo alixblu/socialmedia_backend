@@ -2,6 +2,7 @@ package com.example.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,21 +19,23 @@ public class SecurityConfig {
         this.corsFilter = corsFilter;
     }
 
-
-    // Phân quyền cho các endpoint
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                // Cho phép tất cả GET và PUT tới /users/**
                 .requestMatchers("/users/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
-                // Add other public endpoints as needed
+                // .requestMatchers("/users/**").permitAll()
+                
+                // Cho phép truy cập ảnh
+                .requestMatchers("/images/**").permitAll()
+
+                // Mọi route khác cần xác thực
                 .anyRequest().authenticated()
             );
-        
+
         return http.build();
     }
-} 
+}
