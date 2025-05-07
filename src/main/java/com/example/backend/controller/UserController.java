@@ -3,14 +3,12 @@ package com.example.backend.controller;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -18,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.backend.dto.RegisterDTO;
+import java.io.File;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/users")
@@ -90,11 +90,10 @@ public class UserController {
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
-        System.out.println("Received register request: " + request);
         if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email đã được sử dụng!");
         }
-
+    
         if (userRepository.existsByUsername(request.getUsername())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Tên người dùng đã tồn tại!");
         }
@@ -112,12 +111,69 @@ public class UserController {
         user.setCreatedAt(LocalDate.now());
         user.setIsAdmin(false);
         user.setAvatarUrl("default-avatar.png");
+        user.setUpdatedAt(LocalDate.now());
 
         userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
     }
 
+    //API phần profile
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<?> updateProfile(
+            @PathVariable Integer id,
+            @RequestParam("username") String username,
+            @RequestParam("email") String email,
+            @RequestParam("password") String password,
+            @RequestParam(value = "avatar", required = false) MultipartFile avatarFile
+    ) {
+        // Cập nhật thông tin người dùng
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setPassword(password);
 
+        // Nếu có file ảnh thì lưu lại
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            try {
+                // Tạo thư mục static/images trong resources
+                String uploadDir = "src/main/resources/static/images/";
+                File directory = new File(uploadDir);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+
+                // Xóa file ảnh cũ nếu không phải ảnh mặc định
+                String oldAvatarUrl = user.getAvatarUrl();
+                if (oldAvatarUrl != null && !oldAvatarUrl.equals("default-avatar.png")) {
+                    File oldFile = new File(directory.getAbsolutePath() + File.separator + oldAvatarUrl);
+                    if (oldFile.exists()) {
+                        oldFile.delete();
+                    }
+                }
+
+                // Tạo tên file duy nhất bằng cách thêm timestamp
+                String originalFilename = avatarFile.getOriginalFilename();
+                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String fileName = System.currentTimeMillis() + fileExtension;
+
+                // Lưu file
+                File destFile = new File(directory.getAbsolutePath() + File.separator + fileName);
+                avatarFile.transferTo(destFile);
+
+                // Cập nhật URL avatar trong database
+                user.setAvatarUrl(fileName);
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi lưu file ảnh: " + e.getMessage());
+            }
+        }
+
+        userRepository.save(user); // cập nhật thông tin
+        return ResponseEntity.ok(user);
+    }
 
 }   
