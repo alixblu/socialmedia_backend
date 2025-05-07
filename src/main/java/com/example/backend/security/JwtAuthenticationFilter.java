@@ -31,7 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-
+        if (request.getRequestURI().equals("/users/auth/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         String token = request.getHeader("Authorization");
 
         if (token != null && token.startsWith("Bearer ")) {

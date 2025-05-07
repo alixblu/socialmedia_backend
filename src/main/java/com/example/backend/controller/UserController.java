@@ -75,51 +75,49 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
         }
 
-        // BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        // if (!encoder.matches(password, user.getPassword())) {
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is incorrect");
-        // }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(password, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is incorrect");
+        }
 
-        // // Check if the user is an admin
-        // boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email, true);
+        // Check if the user is an admin
+        boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email, true);
 
-        // Map<String, Object> response = new HashMap<>();
-        // response.put("email", user.getEmail());
-        // response.put("role", isAdmin ? "ADMIN" : "USER");
-        // String token = jwtUtil.generateToken(user.getEmail());
-        // response.put("token", token);
-        return ResponseEntity.ok(user);
+        Map<String, Object> response = new HashMap<>();
+        String token = jwtUtil.generateToken(user.getEmail());
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT) // 409: dữ liệu bị trùng
-                    .body("Email đã được sử dụng!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email đã được sử dụng!");
         }
     
         if (userRepository.existsByUsername(request.getUsername())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("Tên người dùng đã tồn tại!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Tên người dùng đã tồn tại!");
         }
-    
+
+        // Secure password hashing
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(request.getPassword());
+
+        // Create and save the user
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(encodedPassword); // Store hashed password
         user.setDateOfBirth(request.getDateOfBirth());
         user.setCreatedAt(LocalDate.now());
         user.setIsAdmin(false);
         user.setAvatarUrl("default-avatar.png");
-    
+        user.setUpdatedAt(LocalDate.now());
+
         userRepository.save(user);
-    
-        return ResponseEntity
-                .status(HttpStatus.CREATED) // 201: tạo mới thành công
-                .body("Đăng ký thành công!" + user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
     }
-    
+
     //API phần profile
     @PutMapping("/profile/{id}")
     public ResponseEntity<?> updateProfile(
