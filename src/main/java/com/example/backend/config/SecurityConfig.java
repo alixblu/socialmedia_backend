@@ -19,7 +19,6 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -35,27 +34,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF (usually required for REST APIs)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/public/**").permitAll() // Public API
-                        .requestMatchers("/admin/**").permitAll() //.hasRole("ADMIN") // Restricted to ADMIN users
-                        .requestMatchers("/users/auth/login", "/users/auth/register").permitAll() // Allow login and register
-                        .requestMatchers("/users", "/users/", "/users/**").permitAll() //.hasRole("USER") // Restricted to USER role
-                        .anyRequest().authenticated() // All other requests require authentication
+                        .requestMatchers("/**").permitAll() // Allow all requests for testing
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT authentication filter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(false);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Secure password hashing
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager(); // Authentication manager setup
+        return authenticationConfiguration.getAuthenticationManager();
     }
-
 }

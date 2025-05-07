@@ -14,15 +14,15 @@ public class WebConfig {
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // Allow all origins
+        
+        configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins for testing
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(false); // Set to false when allowing all origins
+        configuration.setMaxAge(3600L);
 
         source.registerCorsConfiguration("/**", configuration);
-
         return new CorsFilter(source);
     }
 } 

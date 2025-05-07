@@ -3,11 +3,14 @@ package com.example.backend.controller;
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -81,42 +84,40 @@ public class UserController {
         boolean isAdmin = userRepository.existsByEmailAndIsAdmin(email, true);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("email", user.getEmail());
-        response.put("role", isAdmin ? "ADMIN" : "USER");
         String token = jwtUtil.generateToken(user.getEmail());
         response.put("token", token);
         return ResponseEntity.ok(response);
     }
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
+        System.out.println("Received register request: " + request);
         if (userRepository.existsByEmail(request.getEmail())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT) // 409: dữ liệu bị trùng
-                    .body("Email đã được sử dụng!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email đã được sử dụng!");
         }
-    
+
         if (userRepository.existsByUsername(request.getUsername())) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body("Tên người dùng đã tồn tại!");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Tên người dùng đã tồn tại!");
         }
-    
+
+        // Secure password hashing
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(request.getPassword());
+
+        // Create and save the user
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(encodedPassword); // Store hashed password
         user.setDateOfBirth(request.getDateOfBirth());
         user.setCreatedAt(LocalDate.now());
         user.setIsAdmin(false);
         user.setAvatarUrl("default-avatar.png");
-    
+
         userRepository.save(user);
-    
-        return ResponseEntity
-                .status(HttpStatus.CREATED) // 201: tạo mới thành công
-                .body("Đăng ký thành công!" + user);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Đăng ký thành công!");
     }
-    
+
 
 
 }   
