@@ -71,9 +71,9 @@ public class UserController {
         JwtUtil jwtUtil = new JwtUtil();
         User user = userRepository.findByEmail(email);
 
-        // if (user == null) {
-        //     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
-        // }
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
+        }
 
         // BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         // if (!encoder.matches(password, user.getPassword())) {
