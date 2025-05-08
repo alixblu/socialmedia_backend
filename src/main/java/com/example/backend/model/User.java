@@ -36,5 +36,9 @@ public class User {
     private LocalDate createdAt;
 
     private LocalDate updatedAt;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE; // Default to ACTIVE
 
 }

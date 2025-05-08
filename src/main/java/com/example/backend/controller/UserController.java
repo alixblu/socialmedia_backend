@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.User;
+import com.example.backend.model.UserStatus;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Map;
 import com.example.backend.dto.RegisterDTO;
 import java.io.File;
 import java.io.IOException;
+import com.example.backend.dto.StatusDTO;
 
 @RestController
 @RequestMapping("/users")
@@ -73,6 +75,12 @@ public class UserController {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
+        }
+
+        // Kiểm tra trạng thái tài khoản
+        System.out.println("User status: " + user.getStatus());
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản của bạn đã bị khóa hoặc không hoạt động.");
         }
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -225,6 +233,21 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Lỗi khi lấy danh sách người dùng: " + e.getMessage());
+        }
+    }
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<?> updateUserStatus(@PathVariable Integer userId, @RequestBody StatusDTO statusDTO) {
+        try {
+            User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
+
+            user.setStatus(UserStatus.valueOf(statusDTO.getStatus()));
+            userRepository.save(user);
+
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi cập nhật trạng thái người dùng: " + e.getMessage());
         }
     }
 
