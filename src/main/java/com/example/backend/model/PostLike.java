@@ -7,9 +7,8 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-
 @Entity
-@Table(name = "Postlike")
+@Table(name = "PostLike")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,4 +27,9 @@ public class PostLike {
     private User user;
 
     private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReactionType reactionType; // New field for reactions
 }
+

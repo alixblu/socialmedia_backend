@@ -30,4 +30,7 @@ public class Post {
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+
+    @Column(nullable = false)
+    private Boolean isHidden = false; // Default value set to false
 }
