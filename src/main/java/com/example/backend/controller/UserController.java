@@ -217,4 +217,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/non-admin")
+    public ResponseEntity<?> getAllNonAdminUsers() {
+        try {
+            List<User> nonAdminUsers = userRepository.findByIsAdminFalse();
+            return ResponseEntity.ok(nonAdminUsers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi lấy danh sách người dùng: " + e.getMessage());
+        }
+    }
+
 }   
