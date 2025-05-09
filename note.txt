@@ -1,4 +1,4 @@
-api testing: https://api-spotify-app.postman.co/workspace/Social-Media-Workspace~6cd8477d-62bc-4fac-aa5e-3b4c0d113c89/collection/44415415-56264cb3-279a-455e-94c4-5c51c9c70a53?action=share&creator=44415415
+api testing: https://app.getpostman.com/join-team?invite_code=c3853dc772e08298d0d4513e46ef077a8f2393e750ac28f8e5ff7f09b317933c&target_code=3dc09f6f5c9562af071fe0644c3dac28
 ----generate secret key by terminal
 cd target/classes
 java com.example.backend.security.SecretKeyGenerator
