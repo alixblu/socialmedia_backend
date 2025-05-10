@@ -1,12 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.dto.FriendshipDTO;
-import com.example.backend.model.Friendship;
-import com.example.backend.model.FriendshipStatus;
-import com.example.backend.model.Notification;
-import com.example.backend.model.NotificationStatus;
-import com.example.backend.model.NotificationType;
-import com.example.backend.model.User;
+import com.example.backend.model.*;
 import com.example.backend.repository.FriendshipRepository;
 import com.example.backend.repository.NotificationRepository;
 import com.example.backend.repository.UserRepository;
@@ -36,26 +31,32 @@ public class FriendshipController {
 
     // Gửi lời mời kết bạn
     @PostMapping
-    public ResponseEntity<FriendshipDTO> createFriendship(@RequestBody FriendshipDTO request) {
+    public ResponseEntity<?> createFriendship(@RequestBody FriendshipDTO request) {
         User user1 = userRepository.findById(request.getUser1().getId())
                 .orElseThrow(() -> new IllegalArgumentException("User1 not found"));
         User user2 = userRepository.findById(request.getUser2().getId())
                 .orElseThrow(() -> new IllegalArgumentException("User2 not found"));
 
-        // Kiểm tra xem đã có quan hệ bạn bè chưa
+        // Kiểm tra trạng thái user
+        if (user1.getStatus() != UserStatus.ACTIVE || user2.getStatus() != UserStatus.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot create friendship with banned user");
+        }
+
+        // Kiểm tra trùng lặp quan hệ bạn bè
         List<Friendship> existingFriendships = friendshipRepository
                 .findByUser1_IdOrUser2_Id(user1.getId(), user2.getId());
-        if (existingFriendships.stream()
-                .anyMatch(f -> (f.getUser1().getId().equals(user1.getId()) && f.getUser2().getId().equals(user2.getId()))
-                        || (f.getUser1().getId().equals(user2.getId()) && f.getUser2().getId().equals(user1.getId())))) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        if (existingFriendships.stream().anyMatch(f ->
+                (f.getUser1().getId().equals(user1.getId()) && f.getUser2().getId().equals(user2.getId())) ||
+                        (f.getUser1().getId().equals(user2.getId()) && f.getUser2().getId().equals(user1.getId())))) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Friendship already exists");
         }
 
         Friendship friendship = new Friendship();
         friendship.setUser1(user1);
         friendship.setUser2(user2);
         friendship.setStatus(FriendshipStatus.PENDING);
-        friendship.setCreatedAt(LocalDateTime.now());
         Friendship savedFriendship = friendshipRepository.save(friendship);
 
         // Tạo thông báo cho user2
@@ -79,12 +80,21 @@ public class FriendshipController {
 
     // Chấp nhận lời mời kết bạn
     @PutMapping("/{id}/accept")
-    public ResponseEntity<FriendshipDTO> acceptFriendship(@PathVariable Integer id) {
+    public ResponseEntity<?> acceptFriendship(@PathVariable Integer id) {
         Friendship friendship = friendshipRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Friendship not found"));
 
+        // Kiểm tra trạng thái user
+        if (friendship.getUser1().getStatus() != UserStatus.ACTIVE ||
+                friendship.getUser2().getStatus() != UserStatus.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot accept friendship with banned user");
+        }
+
+        // Kiểm tra trạng thái PENDING
         if (friendship.getStatus() != FriendshipStatus.PENDING) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Friendship is not pending");
         }
 
         friendship.setStatus(FriendshipStatus.ACCEPTED);
@@ -121,9 +131,16 @@ public class FriendshipController {
 
     // Chặn user
     @PutMapping("/{id}/block")
-    public ResponseEntity<FriendshipDTO> blockFriendship(@PathVariable Integer id) {
+    public ResponseEntity<?> blockFriendship(@PathVariable Integer id) {
         Friendship friendship = friendshipRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Friendship not found"));
+
+        // Kiểm tra trạng thái user
+        if (friendship.getUser1().getStatus() != UserStatus.ACTIVE ||
+                friendship.getUser2().getStatus() != UserStatus.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Cannot block banned user");
+        }
 
         friendship.setStatus(FriendshipStatus.BLOCKED);
         Friendship updatedFriendship = friendshipRepository.save(friendship);
@@ -138,11 +155,15 @@ public class FriendshipController {
         ));
     }
 
-    // Lấy danh sách bạn bè hoặc lời mời theo trạng thái
+    // Lấy danh sách bạn bè hoặc lời mời theo trạng thái và user
     @GetMapping("/status/{status}")
-    public List<FriendshipDTO> getFriendshipsByStatus(@PathVariable FriendshipStatus status) {
-        List<Friendship> friendships = friendshipRepository.findByStatus(status);
+    public List<FriendshipDTO> getFriendshipsByStatus(@PathVariable FriendshipStatus status,
+                                                     @RequestParam Integer userId) {
+        List<Friendship> friendships = friendshipRepository.findByUser1_IdOrUser2_Id(userId, userId);
         return friendships.stream()
+                .filter(f -> f.getStatus() == status &&
+                        f.getUser1().getStatus() == UserStatus.ACTIVE &&
+                        f.getUser2().getStatus() == UserStatus.ACTIVE)
                 .map(friendship -> new FriendshipDTO(
                         friendship.getId(),
                         friendship.getCreatedAt(),
@@ -159,6 +180,8 @@ public class FriendshipController {
     public List<FriendshipDTO> getFriendshipsByUser(@PathVariable Integer userId) {
         List<Friendship> friendships = friendshipRepository.findByUser1_IdOrUser2_Id(userId, userId);
         return friendships.stream()
+                .filter(f -> f.getUser1().getStatus() == UserStatus.ACTIVE &&
+                        f.getUser2().getStatus() == UserStatus.ACTIVE)
                 .map(friendship -> new FriendshipDTO(
                         friendship.getId(),
                         friendship.getCreatedAt(),
@@ -180,7 +203,9 @@ public class FriendshipController {
                 .collect(Collectors.toList());
 
         return userRepository.findAll().stream()
-                .filter(user -> !relatedUserIds.contains(user.getId()) && !user.getId().equals(userId))
+                .filter(user -> !relatedUserIds.contains(user.getId()) &&
+                        !user.getId().equals(userId) &&
+                        user.getStatus() == UserStatus.ACTIVE)
                 .collect(Collectors.toList());
     }
 
@@ -188,11 +213,15 @@ public class FriendshipController {
     private long getMutualFriends(Integer userId1, Integer userId2) {
         List<Friendship> user1Friends = friendshipRepository.findByUser1_IdOrUser2_Id(userId1, userId1)
                 .stream()
-                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED)
+                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED &&
+                        f.getUser1().getStatus() == UserStatus.ACTIVE &&
+                        f.getUser2().getStatus() == UserStatus.ACTIVE)
                 .collect(Collectors.toList());
         List<Friendship> user2Friends = friendshipRepository.findByUser1_IdOrUser2_Id(userId2, userId2)
                 .stream()
-                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED)
+                .filter(f -> f.getStatus() == FriendshipStatus.ACCEPTED &&
+                        f.getUser1().getStatus() == UserStatus.ACTIVE &&
+                        f.getUser2().getStatus() == UserStatus.ACTIVE)
                 .collect(Collectors.toList());
 
         Set<Integer> user1FriendIds = user1Friends.stream()
