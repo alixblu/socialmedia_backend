@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "user")
+@Table(name = "User")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,40 +18,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "avatar_url")
-    private String avatarUrl;
-
-    private String bio;
-
-    @Column(name = "created_at")
-    private LocalDate createdAt;
-
-    @Column(name = "date_of_birth")
-    private LocalDate dateOfBirth;
+    @Column(nullable = false, unique = true)
+    private String username;
 
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "is_admin")
-    private boolean isAdmin;
-
     @Column(nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserStatus status;
+    private String avatarUrl;
+    private String bio;
+    private LocalDate dateOfBirth;
+    private Boolean isAdmin;
 
-    @Column(name = "updated_at")
+    @Column(updatable = false)
+    private LocalDate createdAt;
+
     private LocalDate updatedAt;
-
-    @Column(nullable = false, unique = true)
-    private String username;
-}
-
-enum UserStatus {
-    ACTIVE,
-    BANNED
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

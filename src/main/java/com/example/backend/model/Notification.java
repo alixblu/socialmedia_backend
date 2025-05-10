@@ -33,16 +33,3 @@ public class Notification {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
-
-enum NotificationStatus {
-    UNREAD,
-    READ,
-    DISMISSED
-}
-
-enum NotificationType {
-    REPORT,
-    POST_APPROVAL,
-    FRIEND_REQUEST,
-    ALERT
-}
