@@ -52,4 +52,9 @@ public class User {
 enum UserStatus {
     ACTIVE,
     BANNED
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE; // Default to ACTIVE
+
 }

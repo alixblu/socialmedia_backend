@@ -3,6 +3,7 @@ package com.example.backend.repository;
 import com.example.backend.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
@@ -15,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     boolean existsByEmailAndIsAdmin(String email, boolean isAdmin);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    
+    // Find all non-admin users
+    List<User> findByIsAdminFalse();
 }

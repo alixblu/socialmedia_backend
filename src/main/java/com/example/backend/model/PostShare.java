@@ -1,18 +1,18 @@
 package com.example.backend.model;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "PostLike")
+@Table(name = "PostShare")
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostLike {
+public class PostShare {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +26,5 @@ public class PostLike {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private LocalDateTime createdAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private ReactionType reactionType; // New field for reactions
+    private LocalDateTime sharedAt = LocalDateTime.now();
 }
-

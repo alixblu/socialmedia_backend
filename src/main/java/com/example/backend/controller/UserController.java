@@ -1,6 +1,7 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.User;
+import com.example.backend.model.UserStatus;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Map;
 import com.example.backend.dto.RegisterDTO;
 import java.io.File;
 import java.io.IOException;
+import com.example.backend.dto.StatusDTO;
 
 @RestController
 @RequestMapping("/users")
@@ -75,6 +77,12 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email is incorrect");
         }
 
+        // Kiểm tra trạng thái tài khoản
+        System.out.println("User status: " + user.getStatus());
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản của bạn đã bị khóa hoặc không hoạt động.");
+        }
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         if (!encoder.matches(password, user.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Password is incorrect");
@@ -89,7 +97,7 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    
+
     @PostMapping("/auth/register")
     public ResponseEntity<String> register(@RequestBody RegisterDTO request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -133,16 +141,16 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-    
+
         // Set username
         user.setUsername(username);
-    
+
         // Cập nhật password nếu có
         if (password != null && !password.isEmpty()) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             user.setPassword(encoder.encode(password));
         }
-    
+
         // Nếu có file ảnh thì lưu lại
         if (avatarFile != null && !avatarFile.isEmpty()) {
             try {
@@ -152,7 +160,7 @@ public class UserController {
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
-    
+
                 // Xóa file ảnh cũ nếu không phải ảnh mặc định
                 String oldAvatarUrl = user.getAvatarUrl();
                 if (oldAvatarUrl != null && !oldAvatarUrl.equals("default-avatar.png")) {
@@ -161,16 +169,16 @@ public class UserController {
                         oldFile.delete();
                     }
                 }
-    
+
                 // Tạo tên file duy nhất bằng cách thêm timestamp
                 String originalFilename = avatarFile.getOriginalFilename();
                 String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
                 String fileName = System.currentTimeMillis() + fileExtension;
-    
+
                 // Lưu file
                 File destFile = new File(directory.getAbsolutePath() + File.separator + fileName);
                 avatarFile.transferTo(destFile);
-    
+
                 // Cập nhật URL avatar trong database
                 user.setAvatarUrl(fileName);
             } catch (IOException e) {
@@ -178,12 +186,12 @@ public class UserController {
                         .body("Lỗi khi lưu file ảnh: " + e.getMessage());
             }
         }
-    
+
         // Lưu cập nhật người dùng vào database
         userRepository.save(user);
         return ResponseEntity.ok(user);
     }
-    
+
 
     @GetMapping("/getUserByToken")
     public ResponseEntity<?> getUserByToken(@RequestHeader("Authorization") String token) {
@@ -191,14 +199,14 @@ public class UserController {
             if (token != null && token.startsWith("Bearer ")) {
                 token = token.substring(7);
                 JwtUtil jwtUtil = new JwtUtil();
-                
+
                 // Validate token and extract email
                 if (jwtUtil.validateToken(token)) {
                     String email = jwtUtil.extractUsername(token);
-                    
+
                     // Find user by email
                     User user = userRepository.findByEmail(email);
-                    
+
                     if (user != null) {
                         return ResponseEntity.ok(user);
                     } else {
@@ -207,13 +215,39 @@ public class UserController {
                     }
                 }
             }
-            
+
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Token không hợp lệ");
-                
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Lỗi server: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/non-admin")
+    public ResponseEntity<?> getAllNonAdminUsers() {
+        try {
+            List<User> nonAdminUsers = userRepository.findByIsAdminFalse();
+            return ResponseEntity.ok(nonAdminUsers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi lấy danh sách người dùng: " + e.getMessage());
+        }
+    }
+    @PutMapping("/{userId}/status")
+    public ResponseEntity<?> updateUserStatus(@PathVariable Integer userId, @RequestBody StatusDTO statusDTO) {
+        try {
+            User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với ID: " + userId));
+
+            user.setStatus(UserStatus.valueOf(statusDTO.getStatus()));
+            userRepository.save(user);
+
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Lỗi khi cập nhật trạng thái người dùng: " + e.getMessage());
         }
     }
 
