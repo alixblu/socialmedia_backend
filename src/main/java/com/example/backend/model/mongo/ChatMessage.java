@@ -12,8 +12,9 @@ public class ChatMessage {
     @Id
     private String id;
     
-    private String senderId;
-    private String receiverId;
+    private String chatRoomId;
+    private Integer senderId;
+    private Integer receiverId;
     private String content;
     private LocalDateTime timestamp;
     private MessageStatus status;
