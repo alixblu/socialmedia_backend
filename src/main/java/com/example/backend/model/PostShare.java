@@ -8,28 +8,23 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notification")
+@Table(name = "PostShare")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Notification {
+public class PostShare {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    private String message;
-
-    @Enumerated(EnumType.STRING)
-    private NotificationStatus status;
-
-    @Enumerated(EnumType.STRING)
-    private NotificationType type;
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    private LocalDateTime sharedAt = LocalDateTime.now();
 }

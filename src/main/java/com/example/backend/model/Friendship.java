@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Friendship")
+@Table(name = "friendship", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"user_id1", "user_id2"})
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,5 +31,11 @@ public class Friendship {
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "User")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
 public class User {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
