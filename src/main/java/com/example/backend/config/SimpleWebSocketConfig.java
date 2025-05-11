@@ -17,6 +17,6 @@ public class SimpleWebSocketConfig implements WebSocketConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(webSocketHandler, "/ws")
-                .setAllowedOrigins("http://localhost:5173"); // Allow your frontend origin
+                .setAllowedOrigins("http://localhost:5173", "http://localhost:5174"); // Allow your frontend origins
     }
 } 
