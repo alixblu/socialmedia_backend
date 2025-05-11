@@ -136,16 +136,12 @@ public class UserController {
             @RequestParam(value = "password" , required = false) String password,
             @RequestParam(value = "avatar", required = false) MultipartFile avatarFile
     ) {
-        // Cập nhật thông tin người dùng
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
-
-        // Set username
         user.setUsername(username);
 
-        // Cập nhật password nếu có
         if (password != null && !password.isEmpty()) {
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             user.setPassword(encoder.encode(password));

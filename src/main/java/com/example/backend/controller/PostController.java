@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -53,7 +55,12 @@ public class PostController {
             }
 
             Post savedPost = postRepository.save(post);
-            return ResponseEntity.ok(savedPost);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Đăng bài thành công!");
+            response.put("data", savedPost);
+            return ResponseEntity.ok(response);
+
         } catch (IOException e) {
             return ResponseEntity.badRequest().body("Error uploading media: " + e.getMessage());
         } catch (Exception e) {
