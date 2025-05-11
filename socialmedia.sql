@@ -65,7 +65,7 @@ CREATE TABLE `friendship` (
   KEY `FKh5a9q8adro1sejnlx4k0x6srf` (`user_id2`),
   CONSTRAINT `FK9mhm4hjgk4xid3ik02l93sgbr` FOREIGN KEY (`user_id1`) REFERENCES `user` (`id`),
   CONSTRAINT `FKh5a9q8adro1sejnlx4k0x6srf` FOREIGN KEY (`user_id2`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +74,7 @@ CREATE TABLE `friendship` (
 
 LOCK TABLES `friendship` WRITE;
 /*!40000 ALTER TABLE `friendship` DISABLE KEYS */;
-INSERT INTO `friendship` VALUES (1,'2025-01-01 12:00:00.000000','PENDING',1,2),(2,'2025-01-03 13:00:00.000000','ACCEPTED',1,3),(3,'2025-01-04 14:00:00.000000','BLOCKED',2,3);
+INSERT INTO `friendship` VALUES (1,'2025-01-01 12:00:00.000000','PENDING',1,2),(2,'2025-01-03 13:00:00.000000','ACCEPTED',1,3),(3,'2025-01-04 14:00:00.000000','ACCEPTED',2,3),(4,'2025-01-04 14:00:00.000000','ACCEPTED',1,4);
 /*!40000 ALTER TABLE `friendship` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -159,8 +159,37 @@ CREATE TABLE `post_media` (
 
 LOCK TABLES `post_media` WRITE;
 /*!40000 ALTER TABLE `post_media` DISABLE KEYS */;
-INSERT INTO `post_media` VALUES (2,'https://socialmedia3011.s3.amazonaws.com/7e6e10df-dafb-45f3-a7a8-6789a746cc25.png');
+INSERT INTO `post_media` VALUES (2,'https://socialmedia3011.s3.amazonaws.com/7e6e10df-dafb-45f3-a7a8-6789a746cc25.png'),(3,'https://socialmedia3011.s3.amazonaws.com/2152fbc4-7e10-45f0-b7f0-1de9b6043d69.png'),(4,'https://socialmedia3011.s3.amazonaws.com/0977dc83-7d1e-4584-b1f5-24654d14f6e8.png'),(4,'https://socialmedia3011.s3.amazonaws.com/adb8589a-a2d1-475b-9298-441234b9fdba.png');
 /*!40000 ALTER TABLE `post_media` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `post_share`
+--
+
+DROP TABLE IF EXISTS `post_share`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `post_share` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `shared_at` datetime(6) DEFAULT NULL,
+  `post_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK8nx5w7datd3ik1ghxq76lvxht` (`post_id`),
+  KEY `FKgvwujqb86khdvatwmleehoqdc` (`user_id`),
+  CONSTRAINT `FK8nx5w7datd3ik1ghxq76lvxht` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`),
+  CONSTRAINT `FKgvwujqb86khdvatwmleehoqdc` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `post_share`
+--
+
+LOCK TABLES `post_share` WRITE;
+/*!40000 ALTER TABLE `post_share` DISABLE KEYS */;
+/*!40000 ALTER TABLE `post_share` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -179,7 +208,7 @@ CREATE TABLE `posts` (
   PRIMARY KEY (`id`),
   KEY `FKam8ar6luvp8afhfu20gfsydo9` (`user_id`),
   CONSTRAINT `FKam8ar6luvp8afhfu20gfsydo9` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -188,7 +217,7 @@ CREATE TABLE `posts` (
 
 LOCK TABLES `posts` WRITE;
 /*!40000 ALTER TABLE `posts` DISABLE KEYS */;
-INSERT INTO `posts` VALUES (2,'add 2','2025-05-09 22:20:11.486610','2025-05-09 22:20:11.486610',3);
+INSERT INTO `posts` VALUES (2,'add 2','2025-05-09 22:20:11.486610','2025-05-09 22:20:11.486610',3),(3,'test 3','2025-05-10 10:21:32.308147','2025-05-10 10:21:32.308147',3),(4,'caption blah blah','2025-05-11 09:44:37.127260','2025-05-11 09:44:37.127260',2);
 /*!40000 ALTER TABLE `posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -245,7 +274,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_ob8kqyqqgmefl0aco34akdtpe` (`email`),
   UNIQUE KEY `UK_sb8bbouer5wak8vyiiy4pf2bx` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +283,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'https://example.com/avatar1.jpg','Hello world!','2024-01-01','2000-01-01','user1@example.com',_binary '\0','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','ACTIVE','2025-01-01','user1'),(2,'https://example.com/avatar2.jpg','I love coding','2024-02-01','1995-02-01','user2@example.com',_binary '\0','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','ACTIVE','2025-01-01','user2'),(3,'https://example.com/avatar3.jpg','Just chilling','2024-03-01','1990-03-01','user3@example.com',_binary '','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','BANNED','2025-01-01','admin');
+INSERT INTO `user` VALUES (1,'default-avatar.png','Hello world!','2024-01-01','2000-01-01','user1@example.com',_binary '\0','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','ACTIVE','2025-01-01','user1'),(2,'default-avatar.png','I love coding','2024-02-01','1995-02-01','user2@example.com',_binary '\0','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','ACTIVE','2025-01-01','user2'),(3,'default-avatar.png','Just chilling','2024-03-01','1990-03-01','user3@example.com',_binary '','$2b$12$SGcVTo1X8wRQZDp8j8R6OOxqX43fpzowvD70jiQY.pL2w1G0RggHK','ACTIVE','2025-01-01','admin'),(4,'default-avatar.png',NULL,'2025-05-10','2024-01-01','admin@gmail.com',_binary '\0','$2a$10$iP3ppqesl/hNuxgRzJlDzemluTy8mEWdP2FMqpcGCKEOY84Lgk6b2','ACTIVE','2025-05-10','dad sdad');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -267,4 +296,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-09 22:21:54
+-- Dump completed on 2025-05-11 17:08:56
