@@ -1,8 +1,18 @@
 api testing: https://app.getpostman.com/join-team?invite_code=c3853dc772e08298d0d4513e46ef077a8f2393e750ac28f8e5ff7f09b317933c&target_code=3dc09f6f5c9562af071fe0644c3dac28
 
-generate secret key by terminal=============
+==============generate secret key by terminal=============
 cd target/classes
 java com.example.backend.security.SecretKeyGenerator
+
+========= rasa install and activate ============
+py -3.9 -m venv rasa-env
+.\rasa-env\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install rasa
+rasa init
+(rasa train)
+rasa run
+
 
 Summary Table
 | Pattern | Matches /users | Matches /users/1 | Matches /users/abc/def |
@@ -13,5 +23,3 @@ Summary Table
 \* /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
 
 /users* matches /users, /users/, /users123, etc.
-
-
