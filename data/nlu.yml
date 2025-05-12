@@ -89,3 +89,68 @@ nlu:
     - are you a human?
     - am I talking to a bot?
     - am I talking to a human?
+
+- intent: ask_weather
+  examples: |
+    - what's the weather like?
+    - how is the weather today?
+    - will it rain today?
+    - what's the temperature outside?
+    - should I bring an umbrella?
+    - weather forecast
+    - is it sunny?
+    - will it be cold tomorrow?
+    - what's the weather forecast for today?
+    - how hot is it outside?
+
+- intent: restaurant_recommendation
+  examples: |
+    - can you recommend a good restaurant?
+    - where should I eat?
+    - looking for a place to have dinner
+    - best restaurants nearby
+    - what's a good place for lunch?
+    - recommend some food places
+    - where can I find Italian food?
+    - suggest a restaurant for date night
+    - affordable dining options
+    - best rated restaurants in town
+
+- intent: help_request
+  examples: |
+    - help me
+    - I need assistance
+    - can you help?
+    - what can you do?
+    - show me what you can do
+    - how do I use this?
+    - what are your features?
+    - I'm lost
+    - give me instructions
+    - how does this work?
+
+- intent: ask_post_count
+  examples: |
+    - how many posts do I have?
+    - tell me my post count
+    - how many posts have I made?
+    - check my post history
+    - post statistics
+    - number of posts in my account
+    - count my posts
+    - total posts in database
+    - how active have I been posting?
+    - show my posting activity
+
+- intent: ask_friend_count
+  examples: |
+    - how many friends do I have?
+    - how many friend requests did I accept?
+    - tell me about my connections
+    - friend statistics
+    - number of accepted friends
+    - count my friends
+    - how many people have I connected with?
+    - show my friend list count
+    - how many friend requests were accepted?
+    - total friends in my network
