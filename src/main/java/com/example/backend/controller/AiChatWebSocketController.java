@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.mongo.AiChatMessage;
 import com.example.backend.service.AiChatService;
+import com.example.backend.service.RasaAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Controller
 public class AiChatWebSocketController {
@@ -20,6 +21,9 @@ public class AiChatWebSocketController {
     
     @Autowired
     private AiChatService aiChatService;
+    
+    @Autowired(required = false)
+    private RasaAiService rasaAiService;
     
     /**
      * Handle AI chat messages via WebSocket
@@ -32,22 +36,23 @@ public class AiChatWebSocketController {
         Integer userId = (Integer) message.get("userId");
         String content = (String) message.get("content");
         
-        if (userId == null || content == null) {
+        if (userId == null || content == null || rasaAiService == null) {
             Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Thiếu thông tin userId hoặc content");
+            errorResponse.put("error", "Thiếu thông tin userId hoặc content hoặc Rasa service không khả dụng");
             messagingTemplate.convertAndSend("/queue/ai." + botId + "." + userId, errorResponse);
             return;
         }
         
-        // Process the user message and get bot response
-        AiChatMessage botResponse = aiChatService.processUserMessage(userId, botId, content);
+        // Get bot role and generate response using Rasa
+        String botRole = aiChatService.getBotRoleDescription(botId);
+        String rasaResponse = rasaAiService.generateResponse(botRole, content);
         
         // Create response payload
         Map<String, Object> responsePayload = new HashMap<>();
-        responsePayload.put("id", botResponse.getId());
-        responsePayload.put("botId", botResponse.getBotId());
-        responsePayload.put("content", botResponse.getContent());
-        responsePayload.put("timestamp", botResponse.getTimestamp());
+        responsePayload.put("id", UUID.randomUUID().toString());
+        responsePayload.put("botId", botId);
+        responsePayload.put("content", rasaResponse);
+        responsePayload.put("timestamp", System.currentTimeMillis());
         responsePayload.put("role", "BOT");
         
         // Send the response to the specific user and bot queue

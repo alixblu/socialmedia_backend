@@ -1,7 +1,6 @@
 package com.example.backend.service;
 
 import com.example.backend.config.RasaConfiguration.RasaProperties;
-import com.example.backend.model.mongo.AiChatMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpEntity;
@@ -32,10 +31,9 @@ public class RasaAiService {
      * 
      * @param botRole The system role message that defines the bot's personality
      * @param userMessage The message from the user
-     * @param conversationHistory Previous messages for context
      * @return The generated response
      */
-    public String generateResponse(String botRole, String userMessage, List<AiChatMessage> conversationHistory) {
+    public String generateResponse(String botRole, String userMessage) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -43,20 +41,6 @@ public class RasaAiService {
             Map<String, Object> requestBody = new HashMap<>();
             requestBody.put("sender", "user");
             requestBody.put("message", userMessage);
-            
-            // Add conversation context if needed
-            if (!conversationHistory.isEmpty()) {
-                StringBuilder context = new StringBuilder();
-                int historyLimit = Math.min(conversationHistory.size(), 5);
-                for (int i = conversationHistory.size() - historyLimit; i < conversationHistory.size(); i++) {
-                    AiChatMessage message = conversationHistory.get(i);
-                    String role = message.getRole() == AiChatMessage.MessageRole.USER ? "User" : "Bot";
-                    context.append(role).append(": ").append(message.getContent()).append("\n");
-                }
-                requestBody.put("context", context.toString());
-            }
-
-            // Add bot personality/role information
             requestBody.put("bot_role", botRole);
 
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);

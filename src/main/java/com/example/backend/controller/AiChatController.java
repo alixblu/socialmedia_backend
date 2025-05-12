@@ -1,11 +1,9 @@
 package com.example.backend.controller;
 
 import com.example.backend.model.AiBot;
-import com.example.backend.model.mongo.AiChatMessage;
 import com.example.backend.service.AiChatService;
 import com.example.backend.service.RasaAiService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,24 +41,6 @@ public class AiChatController {
     }
     
     /**
-     * Get chat history for a specific user and bot
-     */
-    @GetMapping("/history/{userId}/{botId}")
-    public ResponseEntity<List<AiChatMessage>> getChatHistory(
-            @PathVariable Integer userId,
-            @PathVariable String botId) {
-        return ResponseEntity.ok(aiChatService.getChatHistory(userId, botId));
-    }
-    
-    /**
-     * Get recent conversations for a user across all bots
-     */
-    @GetMapping("/recent/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getRecentConversations(@PathVariable Integer userId) {
-        return ResponseEntity.ok(aiChatService.getRecentConversations(userId));
-    }
-    
-    /**
      * Send a message to a bot and get a response using Rasa
      */
     @PostMapping("/rasa/chat")
@@ -73,28 +53,17 @@ public class AiChatController {
             return ResponseEntity.badRequest().build();
         }
         
-        // Get chat history for context
-        List<AiChatMessage> chatHistory = aiChatService.getChatHistory(userId, botId);
-        
-        // Save user message
-        AiChatMessage userChatMessage = new AiChatMessage(botId, userId, message, AiChatMessage.MessageRole.USER);
-        AiChatMessage savedUserMessage = aiChatService.saveMessage(userChatMessage);
-        
         // Get bot role description
         String botRole = aiChatService.getBotRoleDescription(botId);
         
-        // Generate response using Rasa
-        String rasaResponse = rasaAiService.generateResponse(botRole, message, chatHistory);
-        
-        // Save Rasa response
-        AiChatMessage botChatMessage = new AiChatMessage(botId, userId, rasaResponse, AiChatMessage.MessageRole.BOT);
-        AiChatMessage savedBotMessage = aiChatService.saveMessage(botChatMessage);
+        // Generate response using Rasa (without chat history)
+        String rasaResponse = rasaAiService.generateResponse(botRole, message);
         
         Map<String, Object> result = new HashMap<>();
-        result.put("id", savedBotMessage.getId());
-        result.put("botId", savedBotMessage.getBotId());
-        result.put("content", savedBotMessage.getContent());
-        result.put("timestamp", savedBotMessage.getTimestamp());
+        result.put("id", java.util.UUID.randomUUID().toString());
+        result.put("botId", botId);
+        result.put("content", rasaResponse);
+        result.put("timestamp", System.currentTimeMillis());
         
         return ResponseEntity.ok(result);
     }
