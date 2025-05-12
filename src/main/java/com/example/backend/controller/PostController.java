@@ -4,6 +4,9 @@ import com.example.backend.model.Post;
 import com.example.backend.model.User;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.repository.PostLikeRepository;
+import com.example.backend.repository.PostShareRepository;
+import com.example.backend.repository.CommentRepository;
 import com.example.backend.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,15 @@ public class PostController {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PostLikeRepository postLikeRepository;
+    
+    @Autowired
+    private PostShareRepository postShareRepository;
+    
+    @Autowired
+    private CommentRepository commentRepository;
 
     @Autowired
     private S3Service s3Service;
@@ -116,13 +128,20 @@ public class PostController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Integer id) {
         try {
+            // Xóa tất cả like liên quan đến bài viết
+            postLikeRepository.deleteByPostId(id);
+            commentRepository.deleteByPostId(id);
+            postShareRepository.deleteByPostId(id);
             postRepository.deleteById(id);
-            return ResponseEntity.ok().build();
+
+
+            return ResponseEntity.ok("Post deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deleting post: " + e.getMessage());
         }
     }
+
 }

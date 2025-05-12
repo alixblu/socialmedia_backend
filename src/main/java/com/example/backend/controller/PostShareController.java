@@ -1,6 +1,8 @@
 package com.example.backend.controller;
 
+import com.example.backend.model.Post;
 import com.example.backend.model.PostShare;
+import com.example.backend.model.User;
 import com.example.backend.repository.PostShareRepository;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/shares")
@@ -24,6 +27,11 @@ public class PostShareController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping
+    public List<PostShare> getAllShares() {
+        return postShareRepository.findAll();
+    }
+
     @GetMapping("/post/{postId}")
     public List<PostShare> getSharesByPost(@PathVariable Integer postId) {
         return postShareRepository.findByPostId(postId);
@@ -35,35 +43,45 @@ public class PostShareController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createShare(@RequestBody PostShare share) {
-        // Check if post exists
-        if (!postRepository.existsById(share.getPost().getId())) {
+    public ResponseEntity<?> createShare(
+            @RequestParam Integer postId,
+            @RequestParam Integer userId
+    ) {
+        Optional<Post> postOpt = postRepository.findById(postId);
+        if (postOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Post not found");
         }
 
-        // Check if user exists
-        if (!userRepository.existsById(share.getUser().getId())) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("User not found");
         }
 
-        // Check if user has already shared this post
-        if (postShareRepository.existsByPostIdAndUserId(
-                share.getPost().getId(), 
-                share.getUser().getId())) {
-            return ResponseEntity.badRequest().body("User has already shared this post");
+        if (postShareRepository.existsByPostIdAndUserId(postId, userId)) {
+            return ResponseEntity.badRequest().body("Bạn đã chia sẽ post này rồi");
         }
 
-        PostShare savedShare = postShareRepository.save(share);
+        PostShare newShare = new PostShare();
+        newShare.setPost(postOpt.get());
+        newShare.setUser(userOpt.get());
+
+        PostShare savedShare = postShareRepository.save(newShare);
         return ResponseEntity.ok(savedShare);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteShare(@PathVariable Integer id) {
+    @DeleteMapping
+    public ResponseEntity<?> deleteShare(@RequestParam Integer postId, @RequestParam Integer userId) {
         try {
-            postShareRepository.deleteById(id);
+            Optional<PostShare> shareOpt = postShareRepository.findByPostIdAndUserId(postId, userId);
+            if (shareOpt.isEmpty()) {
+                return ResponseEntity.badRequest().body("Không tìm thấy chia sẻ");
+            }
+
+            postShareRepository.delete(shareOpt.get());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting share: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Lỗi khi xóa chia sẻ: " + e.getMessage());
         }
     }
-} 
+
+}

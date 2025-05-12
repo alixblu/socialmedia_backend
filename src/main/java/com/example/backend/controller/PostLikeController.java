@@ -56,21 +56,28 @@ public class PostLikeController {
         return ResponseEntity.ok(saved);
     }
 
-
     @DeleteMapping
     public ResponseEntity<?> deleteLikeByUserAndPost(
             @RequestParam Integer postId,
             @RequestParam Integer userId) {
 
-        Optional<PostLike> likeOpt = postLikeRepository.findByPostIdAndUserId(postId, userId);
+        Optional<Post> postOpt = postRepository.findById(postId);
+        Optional<User> userOpt = userRepository.findById(userId);
 
-        if (likeOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (postOpt.isEmpty() || userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body("Post hoặc User không tồn tại");
         }
 
-        postLikeRepository.deleteById(likeOpt.get().getId());
-        return ResponseEntity.ok().build();
+        Optional<PostLike> likeOpt = postLikeRepository.findByPostAndUser(postOpt.get(), userOpt.get());
+
+        if (likeOpt.isEmpty()) {
+            return ResponseEntity.status(404).body("Không tìm thấy like để xóa");
+        }
+
+        postLikeRepository.delete(likeOpt.get());
+        return ResponseEntity.ok("Unlike thành công");
     }
+
 
 
 }
