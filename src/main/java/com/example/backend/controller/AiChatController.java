@@ -61,32 +61,7 @@ public class AiChatController {
     }
     
     /**
-     * Send a message to a bot and get a response (OpenAI)
-     */
-    @PostMapping("/chat")
-    public ResponseEntity<Map<String, Object>> sendMessage(@RequestBody Map<String, Object> request) {
-        Integer userId = (Integer) request.get("userId");
-        String botId = (String) request.get("botId");
-        String message = (String) request.get("message");
-        
-        if (userId == null || botId == null || message == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        
-        AiChatMessage response = aiChatService.processUserMessage(userId, botId, message);
-        
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", response.getId());
-        result.put("botId", response.getBotId());
-        result.put("content", response.getContent());
-        result.put("timestamp", response.getTimestamp());
-        
-        return ResponseEntity.ok(result);
-    }
-    
-    /**
      * Send a message to a bot and get a response using Rasa
-     * This endpoint is only available when the rasa profile is active
      */
     @PostMapping("/rasa/chat")
     public ResponseEntity<Map<String, Object>> sendRasaMessage(@RequestBody Map<String, Object> request) {

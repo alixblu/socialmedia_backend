@@ -13,6 +13,8 @@ intents:
   - help_request
   - ask_post_count
   - ask_friend_count
+  - ask_restaurant
+  - out_of_scope
 
 responses:
   utter_greet:
@@ -32,15 +34,15 @@ responses:
   - text: "Bye"
 
   utter_iamabot:
-  - text: "I am a bot, powered by Rasa."
+  - text: "I am a bot, powered by Rasa and Ollama."
   
   utter_weather:
-  - text: "I don't have real-time weather data, but I can tell you it's a great day to chat with me!"
+  - text: "The weather is currently {weather_condition} with a temperature of {temperature}°C."
   - text: "I'm not connected to weather services yet, but you might want to check your local forecast."
   - text: "The weather inside my server is always perfect! For outside weather, check a weather app."
 
   utter_restaurant:
-  - text: "I'd recommend trying the new Thai place downtown. I've heard great things about it!"
+  - text: "I recommend {restaurant_name}. It's known for {cuisine_type} cuisine and has a rating of {rating} stars."
   - text: "How about trying that Italian restaurant on Main Street? Their pasta is supposed to be amazing."
   - text: "I wish I could taste food! For the best recommendations, consider your favorite cuisine and check local reviews."
 
@@ -58,6 +60,13 @@ responses:
   - text: "You have accepted 15 friend requests so far. You're building a nice network!"
   - text: "Your friend count currently stands at 15 accepted connections."
   - text: "The database shows you've connected with 15 friends. Your social circle is growing!"
+
+  utter_out_of_scope:
+  - text: "I'm not sure I understand. Let me try to help you with that using my language model."
+
+actions:
+  - action_ask_ollama
+  - action_ollama_fallback
 
 session_config:
   session_expiration_time: 60

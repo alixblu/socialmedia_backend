@@ -62,18 +62,21 @@ public class RasaAiService {
             HttpEntity<Map<String, Object>> request = new HttpEntity<>(requestBody, headers);
             
             // Call Rasa endpoint
-            Map<String, Object> response = restTemplate.postForObject(
+            List<Map<String, Object>> responses = restTemplate.postForObject(
                     rasaProperties.getUrl() + "/webhooks/rest/webhook", 
                     request, 
-                    Map.class);
+                    List.class);
 
-            if (response != null && response.containsKey("text")) {
-                return response.get("text").toString();
-            } else if (response != null && response.containsKey("message")) {
-                return response.get("message").toString();
-            } else {
-                return "Không thể tạo phản hồi từ Rasa. Vui lòng thử lại sau.";
+            if (responses != null && !responses.isEmpty()) {
+                Map<String, Object> firstResponse = responses.get(0);
+                if (firstResponse.containsKey("text")) {
+                    return firstResponse.get("text").toString();
+                } else if (firstResponse.containsKey("message")) {
+                    return firstResponse.get("message").toString();
+                }
             }
+            
+            return "Không thể tạo phản hồi từ Rasa. Vui lòng thử lại sau.";
         } catch (Exception e) {
             e.printStackTrace();
             return "Đã xảy ra lỗi khi kết nối với Rasa API: " + e.getMessage();

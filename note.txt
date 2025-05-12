@@ -9,17 +9,36 @@ py -3.9 -m venv rasa-env
 .\rasa-env\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install rasa
+pip install rasa requests
 rasa init
 (rasa train)
-rasa run
+
+# Terminal 1
+rasa run --enable-api --cors "*" --port 5005
+
+# Terminal 2
+rasa run actions --port 5055
+
+#Terminal 3 (for checking)
+curl http://localhost:5005/status
+
+#start mongo in specific port
+mongod --port 27018 --dbpath "C:\data\db"
 
 
-Summary Table
-| Pattern | Matches /users | Matches /users/1 | Matches /users/abc/def |
-|-----------------|:----------------:|:------------------:|:------------------------:|
-| /users | ✔ | ✗ | ✗ |
-| /users/** | ✗ | ✔ | ✔ |
-| /users* | ✔ | ✔* | ✔* |
-\* /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
+ /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
 
 /users* matches /users, /users/, /users123, etc.
+
+
+Rasa
+→ A trainable conversational AI framework
+→ You must define intents, examples, and responses
+→ Can handle structured dialogues, call APIs (e.g., to database, weather, etc.)
+→ Only responds meaningfully to questions it’s been trained for
+
+Ollama
+→ A local LLM runner (e.g., LLaMA, Mistral)
+→ No training needed — uses pre-trained models
+→ Responds to open-ended prompts, like GPT
+→ Returns raw text only, no built-in logic, memory, or API support

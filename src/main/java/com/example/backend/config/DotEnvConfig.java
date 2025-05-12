@@ -34,10 +34,7 @@ public class DotEnvConfig {
             // Load .env file
             Dotenv dotenv = Dotenv.configure().load();
             
-            // Set environment variables from .env if they don't already exist in the system
-            if (System.getenv("OPENAI_API_KEY") == null && dotenv.get("OPENAI_API_KEY") != null) {
-                System.setProperty("OPENAI_API_KEY", dotenv.get("OPENAI_API_KEY"));
-            }
+
         }
     }
 } 

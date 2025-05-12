@@ -14,4 +14,6 @@ public interface AiChatMessageRepository extends MongoRepository<AiChatMessage, 
     List<AiChatMessage> findTop20ByUserIdAndBotIdOrderByTimestampDesc(Integer userId, String botId);
     
     List<AiChatMessage> findDistinctBotIdByUserId(Integer userId);
+    
+    List<AiChatMessage> findByUserIdOrderByTimestampDesc(Integer userId);
 } 

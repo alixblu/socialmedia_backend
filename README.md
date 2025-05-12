@@ -9,11 +9,7 @@ This application provides two AI integration options for the chatbot system:
 1. Sign up for an OpenAI account and obtain an API key at https://platform.openai.com/
 2. Set the API key as an environment variable:
    ```
-   export OPENAI_API_KEY=your_actual_api_key_here
-   ```
-   Or add it to your .env file:
-   ```
-   OPENAI_API_KEY=your_actual_api_key_here
+
    ```
 3. The model can be configured in application.properties:
    ```
