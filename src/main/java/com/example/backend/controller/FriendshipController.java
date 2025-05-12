@@ -163,7 +163,8 @@ public class FriendshipController {
         return friendships.stream()
                 .filter(f -> f.getStatus() == status &&
                         f.getUser1().getStatus() == UserStatus.ACTIVE &&
-                        f.getUser2().getStatus() == UserStatus.ACTIVE)
+                        f.getUser2().getStatus() == UserStatus.ACTIVE &&
+                        (status != FriendshipStatus.PENDING || f.getUser2().getId().equals(userId))) // Chỉ lấy lời mời nhận được
                 .map(friendship -> new FriendshipDTO(
                         friendship.getId(),
                         friendship.getCreatedAt(),
