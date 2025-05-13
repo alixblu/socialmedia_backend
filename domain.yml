@@ -1,0 +1,73 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - ask_weather
+  - restaurant_recommendation
+  - help_request
+  - ask_post_count
+  - ask_friend_count
+  - ask_restaurant
+  - out_of_scope
+
+responses:
+  utter_greet:
+  - text: "Hey! How are you?"
+
+  utter_cheer_up:
+  - text: "Here is something to cheer you up:"
+    image: "https://i.imgur.com/nGF1K8f.jpg"
+
+  utter_did_that_help:
+  - text: "Did that help you?"
+
+  utter_happy:
+  - text: "Great, carry on!"
+
+  utter_goodbye:
+  - text: "Bye"
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa and Ollama."
+  
+  utter_weather:
+  - text: "The weather is currently {weather_condition} with a temperature of {temperature}°C."
+  - text: "I'm not connected to weather services yet, but you might want to check your local forecast."
+  - text: "The weather inside my server is always perfect! For outside weather, check a weather app."
+
+  utter_restaurant:
+  - text: "I recommend {restaurant_name}. It's known for {cuisine_type} cuisine and has a rating of {rating} stars."
+  - text: "How about trying that Italian restaurant on Main Street? Their pasta is supposed to be amazing."
+  - text: "I wish I could taste food! For the best recommendations, consider your favorite cuisine and check local reviews."
+
+  utter_help:
+  - text: "I can help with greetings, chat about your mood, recommend restaurants, or discuss weather. Just ask me anything!"
+  - text: "I'm your friendly assistant. Try asking me about your day, restaurants, weather, or just say hi!"
+  - text: "Need help? I can respond to greetings, talk about your mood, or give simple recommendations. What would you like to know?"
+
+  utter_post_count:
+  - text: "You currently have 24 posts in the database. Your most active posting month was March!"
+  - text: "I checked your account and found 24 posts. You've been quite active recently!"
+  - text: "According to the database, you have created 24 posts in total. Keep up the good work!"
+
+  utter_friend_count:
+  - text: "You have accepted 15 friend requests so far. You're building a nice network!"
+  - text: "Your friend count currently stands at 15 accepted connections."
+  - text: "The database shows you've connected with 15 friends. Your social circle is growing!"
+
+  utter_out_of_scope:
+  - text: "I'm not sure I understand. Let me try to help you with that using my language model."
+
+actions:
+  - action_ask_ollama
+  - action_ollama_fallback
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
