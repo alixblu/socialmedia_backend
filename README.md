@@ -18,6 +18,7 @@ This project is a full-featured social media platform inspired by Facebook. It s
 
 - Spring Boot
 - Spring WebSocket
+- Spring Data JPA (MySQL)
 - Spring Data MongoDB
 - Spring Security
 - Rasa NLU (local AI)
@@ -25,21 +26,66 @@ This project is a full-featured social media platform inspired by Facebook. It s
 - S3-compatible cloud storage (for file/image uploads)
 - (Frontend: React, see frontend/README.md)
 
+## Database Architecture
+
+The project uses a dual database architecture:
+
+### MySQL (Primary Database)
+- Stores core application data:
+  - User profiles and authentication
+  - Posts and comments
+  - Likes and reactions
+  - Friendships and relationships
+  - Notifications
+- Uses Spring Data JPA for data access
+- Schema defined in `socialmedia.sql`
+
+### MongoDB (Chat Database)
+- Stores chat-related data:
+  - AI chat messages and history
+  - Chat intents and responses
+  - Bot configurations and capabilities
+- Uses Spring Data MongoDB for data access
+- Optimized for chat message storage and retrieval
+
 ## Getting Started
 
 ### Prerequisites
-- Java 17+
+- Java 21
 - Maven
+- MySQL 8.0+
 - MongoDB (local, default port or custom)
 - Node.js & npm (for frontend)
 - Python 3.9 (for Rasa)
 - Ollama (for running Phi model locally)
-- S3-compatible storage (e.g., AWS S3, MinIO, etc.)
+- AWS S3
 
-### MongoDB Setup
+### Database Setup
+
+#### MySQL Setup
+1. Create a new database:
+   ```sql
+   CREATE DATABASE socialmedia;
+   ```
+2. Import the schema:
+   ```
+   mysql -u your_username -p socialmedia < socialmedia.sql
+   ```
+3. Configure MySQL connection in `application.properties`:
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/socialmedia
+   spring.datasource.username=your_username
+   spring.datasource.password=your_password
+   ```
+
+#### MongoDB Setup
 - Start MongoDB (default or custom port, e.g. 27018):
   ```
   mongod --port 27018 --dbpath "C:\data\db"
+  ```
+- Configure MongoDB connection in `application.properties`:
+  ```properties
+  spring.data.mongodb.uri=mongodb://localhost:27018/socialmedia
   ```
 
 ## AI Integration (Rasa NLU + Phi Model via Ollama)
@@ -47,11 +93,8 @@ This project is a full-featured social media platform inspired by Facebook. It s
 ### Rasa NLU Integration Setup (Local AI)
 
 #### 1. Install and Set Up Rasa (Inside backend Directory)
-- Open a terminal and navigate to the backend directory:
-  ```
-  cd backend
-  ```
-- Create a Python 3.9 virtual environment named `rasa-env` inside the backend directory and activate it:
+
+- Create a Python 3.9 virtual environment named `rasa-env` inside this repo directory and activate it:
   ```
   py -3.9 -m venv rasa-env
   .\rasa-env\Scripts\Activate.ps1
@@ -106,8 +149,8 @@ This project is a full-featured social media platform inspired by Facebook. It s
   ollama.model=phi
   ```
 
-## S3-Compatible Cloud Storage
-- The backend supports file and image uploads to S3-compatible storage (e.g., AWS S3, MinIO).
+## S3 - Amazon Simple Storage Service
+- The backend supports file and image uploads to AWS S3.
 - Configure your S3 credentials and bucket in `application.properties` or as environment variables.
 
 ## Running the Application

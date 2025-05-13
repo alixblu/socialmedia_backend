@@ -26,7 +26,7 @@ curl http://localhost:5005/status
 mongod --port 27018 --dbpath "C:\data\db"
 
 
- /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
+/users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
 
 /users* matches /users, /users/, /users123, etc.
 
