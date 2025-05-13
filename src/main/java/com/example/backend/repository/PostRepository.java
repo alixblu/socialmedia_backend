@@ -16,4 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     List<Post> findByContentContainingIgnoreCase(String keyword);
 
     List<Post> findAllByOrderByCreatedAtDesc();
+    
+
+
 }
