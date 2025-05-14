@@ -1,8 +1,9 @@
 package com.example.backend.model;
 
 public enum ReportReason {
-    SPAM,
-    HARASSMENT,
     INAPPROPRIATE_CONTENT,
-    OTHER
+    SPAM_OR_SCAM,
+    HATE_SPEECH,
+    FALSE_INFORMATION,
+    OTHER;
 }
