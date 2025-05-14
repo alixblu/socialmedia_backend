@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/ai")
+@RequestMapping("/ai")
 public class AiChatController {
     private static final Logger logger = LoggerFactory.getLogger(AiChatController.class);
 

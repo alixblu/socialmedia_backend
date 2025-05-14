@@ -23,13 +23,25 @@ public class OllamaService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private static final String OLLAMA_API_URL = "http://localhost:11434/api/generate";
-    private static final String MODEL = "phi";
-    private static final int TIMEOUT = 10000; // 10 seconds timeout
+    private static final String OLLAMA_BASE_URL = "http://localhost:11434";
+    private static final String OLLAMA_GENERATE_URL = OLLAMA_BASE_URL + "/api/generate";
+    private static final String OLLAMA_TAGS_URL = OLLAMA_BASE_URL + "/api/tags";
+    private static final String MODEL = "tinyllama";
+    private static final int TIMEOUT = 30000; // Increased timeout to 30 seconds
 
     public String generateResponse(String userMessage) {
         try {
-            logger.info("Attempting to connect to Ollama at: {}", OLLAMA_API_URL);
+            // First, verify Ollama is running and model is available
+            logger.info("Checking Ollama availability...");
+            ResponseEntity<Map> tagsResponse = restTemplate.getForEntity(OLLAMA_TAGS_URL, Map.class);
+            logger.info("Ollama tags response: {}", tagsResponse.getBody());
+
+            if (tagsResponse.getStatusCode() != HttpStatus.OK) {
+                logger.error("Ollama tags endpoint returned non-OK status: {}", tagsResponse.getStatusCode());
+                return MODEL+ ": Error connecting to AI service. Please make sure Ollama is running.";
+            }
+
+            logger.info("Attempting to connect to Ollama at: {}", OLLAMA_GENERATE_URL);
             logger.info("Using model: {}", MODEL);
             logger.info("User message: {}", userMessage);
             
@@ -57,7 +69,7 @@ public class OllamaService {
             // Make the API call
             logger.info("Sending request to Ollama...");
             ResponseEntity<Map> response = restTemplate.postForEntity(
-                OLLAMA_API_URL,
+                OLLAMA_GENERATE_URL,
                 request,
                 Map.class
             );
@@ -69,25 +81,17 @@ public class OllamaService {
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null && response.getBody().containsKey("response")) {
                 String ollamaResponse = (String) response.getBody().get("response");
                 logger.info("Successfully extracted response: {}", ollamaResponse);
-                return "Phi: " + ollamaResponse;
+                return MODEL+ ": " + ollamaResponse;
             } else {
                 logger.error("Invalid response from Ollama: {}", response.getBody());
-                return "Phi: I'm having trouble generating a response. Please try again.";
+                return MODEL+ ": I'm having trouble generating a response. Please try again.";
             }
         } catch (RestClientException e) {
             logger.error("Error connecting to Ollama: {}", e.getMessage(), e);
-            // Check if Ollama is running
-            try {
-                ResponseEntity<String> healthCheck = restTemplate.getForEntity("http://localhost:11434/api/tags", String.class);
-                logger.info("Ollama health check response: {}", healthCheck.getStatusCode());
-                return "Phi: Error connecting to AI service. Please make sure Ollama is running.";
-            } catch (Exception ex) {
-                logger.error("Ollama health check failed: {}", ex.getMessage(), ex);
-                return "Phi: Error connecting to AI service. Please make sure Ollama is running and accessible at http://localhost:11434";
-            }
+            return MODEL+ ": Error connecting to AI service. Please make sure Ollama is running and accessible at " + OLLAMA_BASE_URL;
         } catch (Exception e) {
             logger.error("Unexpected error in Ollama service: {}", e.getMessage(), e);
-            return "Phi: An unexpected error occurred. Please try again.";
+            return MODEL+ ": An unexpected error occurred. Please try again.";
         }
     }
 } 
