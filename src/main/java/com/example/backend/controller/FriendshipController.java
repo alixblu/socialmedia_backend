@@ -8,6 +8,7 @@ import com.example.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/friendships")
+@CrossOrigin(origins = "http://localhost:5173")
 public class FriendshipController {
 
     @Autowired
@@ -30,6 +33,15 @@ public class FriendshipController {
     private NotificationRepository notificationRepository;
 
     // Gửi lời mời kết bạn
+    @GetMapping("/between")
+    public ResponseEntity<?> getFriendshipBetweenUsers(
+            @RequestParam Integer userId1,
+            @RequestParam Integer userId2) {
+        Optional<Friendship> friendship = friendshipRepository.findByUserIds(userId1, userId2);
+        return friendship.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public ResponseEntity<?> createFriendship(@RequestBody FriendshipDTO request) {
         User user1 = userRepository.findById(request.getUser1().getId())
