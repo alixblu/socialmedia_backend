@@ -59,7 +59,9 @@ public class PostLikeController {
     @DeleteMapping
     public ResponseEntity<?> deleteLikeByUserAndPost(
             @RequestParam Integer postId,
-            @RequestParam Integer userId) {
+            @RequestParam Integer userId,
+            @RequestParam ReactionType reactionType 
+    ) {
 
         Optional<Post> postOpt = postRepository.findById(postId);
         Optional<User> userOpt = userRepository.findById(userId);
