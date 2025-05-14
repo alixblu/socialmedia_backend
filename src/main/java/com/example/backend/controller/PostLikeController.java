@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public class PostLikeController {
         postLike.setPost(postOpt.get());
         postLike.setUser(userOpt.get());
         postLike.setReactionType(reactionType);
-
+        postLike.setCreatedAt(LocalDateTime.now());
         PostLike saved = postLikeRepository.save(postLike);
         return ResponseEntity.ok(saved);
     }

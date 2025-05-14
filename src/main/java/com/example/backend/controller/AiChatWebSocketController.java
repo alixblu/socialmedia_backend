@@ -1,6 +1,6 @@
 package com.example.backend.controller;
 
-import com.example.backend.service.AiChatService;
+
 import com.example.backend.service.RasaAiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,9 +18,7 @@ public class AiChatWebSocketController {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
-    
-    @Autowired
-    private AiChatService aiChatService;
+
     
     @Autowired(required = false)
     private RasaAiService rasaAiService;
@@ -44,7 +42,7 @@ public class AiChatWebSocketController {
         }
         
         // Get bot role and generate response using Rasa
-        String botRole = aiChatService.getBotRoleDescription(botId);
+        String botRole = "A helpful AI assistant";
         String rasaResponse = rasaAiService.generateResponse(botRole, content);
         
         // Create response payload

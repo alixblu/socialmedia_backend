@@ -28,6 +28,7 @@ public class PostLike {
 
     private LocalDateTime createdAt;
 
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReactionType reactionType; // New field for reactions

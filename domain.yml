@@ -13,16 +13,26 @@ intents:
   - help_request
   - ask_post_count
   - ask_friend_count
-  - ask_restaurant
+  - ask_likes_received
+  - ask_comments_written
+  - ask_last_post
+  - ask_most_liked_post
+  - ask_recent_friends
+  - ask_last_week_posts
+  - ask_top_posts
+  - ask_monthly_posts
+  - ask_most_commented_post
+  - ask_profile_info
+  - ask_most_active_month
   - out_of_scope
+  - general_question
 
 responses:
   utter_greet:
   - text: "Hey! How are you?"
 
   utter_cheer_up:
-  - text: "Here is something to cheer you up:"
-    image: "https://i.imgur.com/nGF1K8f.jpg"
+  - text: "What should i do to cheer you up:"
 
   utter_did_that_help:
   - text: "Did that help you?"
@@ -47,26 +57,26 @@ responses:
   - text: "I wish I could taste food! For the best recommendations, consider your favorite cuisine and check local reviews."
 
   utter_help:
-  - text: "I can help with greetings, chat about your mood, recommend restaurants, or discuss weather. Just ask me anything!"
-  - text: "I'm your friendly assistant. Try asking me about your day, restaurants, weather, or just say hi!"
-  - text: "Need help? I can respond to greetings, talk about your mood, or give simple recommendations. What would you like to know?"
-
-  utter_post_count:
-  - text: "You currently have 24 posts in the database. Your most active posting month was March!"
-  - text: "I checked your account and found 24 posts. You've been quite active recently!"
-  - text: "According to the database, you have created 24 posts in total. Keep up the good work!"
-
-  utter_friend_count:
-  - text: "You have accepted 15 friend requests so far. You're building a nice network!"
-  - text: "Your friend count currently stands at 15 accepted connections."
-  - text: "The database shows you've connected with 15 friends. Your social circle is growing!"
-
-  utter_out_of_scope:
-  - text: "I'm not sure I understand. Let me try to help you with that using my language model."
+  - text: "I can help you with various statistics about your social media activity! You can ask me about your posts, likes, comments, friends, and more. Just ask me anything!"
+  - text: "I'm your friendly assistant. I can tell you about your post count, likes received, comments made, friend count, and other social media statistics. What would you like to know?"
+  - text: "Need help? I can show you your social media statistics including posts, likes, comments, friends, and more. What would you like to know?"
 
 actions:
-  - action_ask_ollama
   - action_ollama_fallback
+  - action_ask_ollama
+  - action_handle_post_count
+  - action_handle_friend_count
+  - action_handle_likes_received
+  - action_handle_comments_written
+  - action_handle_last_post
+  - action_handle_most_liked_post
+  - action_handle_recent_friends
+  - action_handle_last_week_posts
+  - action_handle_top_posts
+  - action_handle_monthly_posts
+  - action_handle_most_commented_post
+  - action_handle_profile_info
+  - action_handle_most_active_month
 
 session_config:
   session_expiration_time: 60
