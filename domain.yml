@@ -13,7 +13,17 @@ intents:
   - help_request
   - ask_post_count
   - ask_friend_count
-  - ask_restaurant
+  - ask_likes_received
+  - ask_comments_written
+  - ask_last_post
+  - ask_most_liked_post
+  - ask_recent_friends
+  - ask_last_week_posts
+  - ask_top_posts
+  - ask_monthly_posts
+  - ask_most_commented_post
+  - ask_profile_info
+  - ask_most_active_month
   - out_of_scope
   - general_question
 
@@ -47,15 +57,26 @@ responses:
   - text: "I wish I could taste food! For the best recommendations, consider your favorite cuisine and check local reviews."
 
   utter_help:
-  - text: "I can help with greetings, chat about your mood, or discuss general topics. Just ask me anything!"
-  - text: "I'm your friendly assistant. Try asking me about your day or just say hi!"
-  - text: "Need help? I can respond to greetings and talk about your mood. What would you like to know?"
+  - text: "I can help you with various statistics about your social media activity! You can ask me about your posts, likes, comments, friends, and more. Just ask me anything!"
+  - text: "I'm your friendly assistant. I can tell you about your post count, likes received, comments made, friend count, and other social media statistics. What would you like to know?"
+  - text: "Need help? I can show you your social media statistics including posts, likes, comments, friends, and more. What would you like to know?"
 
 actions:
   - action_ollama_fallback
   - action_ask_ollama
   - action_handle_post_count
   - action_handle_friend_count
+  - action_handle_likes_received
+  - action_handle_comments_written
+  - action_handle_last_post
+  - action_handle_most_liked_post
+  - action_handle_recent_friends
+  - action_handle_last_week_posts
+  - action_handle_top_posts
+  - action_handle_monthly_posts
+  - action_handle_most_commented_post
+  - action_handle_profile_info
+  - action_handle_most_active_month
 
 session_config:
   session_expiration_time: 60

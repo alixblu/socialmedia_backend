@@ -36,5 +36,5 @@ stories:
 
 - story: restaurant path
   steps:
-  - intent: ask_restaurant
+  - intent: restaurant_recommendation
   - action: action_ollama_fallback

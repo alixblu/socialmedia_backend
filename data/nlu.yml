@@ -151,6 +151,108 @@ nlu:
     - how many posts have i created
     - what's the total number of my posts
     - count all my posts
+    - what's my posting activity like
+    - how many times have i posted
+    - give me my post count
+    - show me how many posts i've made
+    - what's my total post count
+    - how many posts are in my profile
+    - can you count my posts
+    - what's the number of my posts
+    - how many posts do i have in total
+    - tell me the total number of my posts
+
+- intent: ask_likes_received
+  examples: |
+    - how many likes have I received?
+    - count my total likes
+    - how many likes do I have?
+    - show me my total likes
+    - what's my like count?
+    - how many people liked my posts?
+    - total likes on my posts
+    - how many likes have I gotten?
+    - what's the total number of likes I received?
+    - count all likes on my posts
+    - how many likes are on my posts
+    - show me my likes statistics
+    - what's my total like count
+    - how many likes have people given me
+    - tell me how many likes I have
+    - what's the number of likes I received
+    - can you count my total likes
+    - how many likes are in my posts
+    - what's my like count in total
+    - show me my total received likes
+
+- intent: ask_comments_written
+  examples: |
+    - how many comments have I written?
+    - count my comments
+    - how many comments did I make?
+    - show me my comment count
+    - what's my total comments?
+    - how many times have I commented?
+    - total comments I've written
+    - how many comments do I have?
+    - what's the total number of my comments?
+    - count all my comments
+    - how many comments are from me
+    - show me my commenting activity
+    - what's my total comment count
+    - how many comments have I posted
+    - tell me how many comments I made
+    - what's the number of my comments
+    - can you count my total comments
+    - how many comments are in my history
+    - what's my comment count in total
+    - show me my total written comments
+
+- intent: ask_last_post
+  examples: |
+    - when was my last post?
+    - show me my most recent post
+    - what did I post last?
+    - when did I last post something?
+    - what's my latest post?
+    - show my most recent activity
+    - what was my last post about?
+    - when did I post last?
+    - what's the last thing I posted?
+    - show me my latest post
+    - what did I post most recently?
+    - when was my most recent post?
+    - what's my newest post?
+    - show me what I posted last
+    - what was my last post content?
+    - when did I make my last post?
+    - what's the most recent thing I posted?
+    - show my last post details
+    - what did I post most lately?
+    - tell me about my last post
+
+- intent: ask_most_liked_post
+  examples: |
+    - what's my most liked post?
+    - which post got the most likes?
+    - show me my most popular post
+    - what post received the most likes?
+    - which of my posts is most liked?
+    - what's my highest liked post?
+    - show my most successful post
+    - which post has the most likes?
+    - what's my best performing post?
+    - show me my most liked content
+    - what post got the most reactions?
+    - which post is most popular?
+    - what's my top liked post?
+    - show me my most appreciated post
+    - which post received highest likes?
+    - what's my most engaging post?
+    - show my highest rated post
+    - which post has highest engagement?
+    - what's my most viral post?
+    - tell me about my most liked post
 
 - intent: ask_friend_count
   examples: |
@@ -164,19 +266,177 @@ nlu:
     - show my friend list count
     - how many friend requests were accepted?
     - total friends in my network
+    - what's my friend count?
+    - how many friends are in my list?
+    - show me my total friends
+    - how many connections do I have?
+    - what's the number of my friends?
+    - count all my friends
+    - how many people are in my network?
+    - what's my total friend count?
+    - show me my friend statistics
+    - how many friends have I made?
 
-- intent: ask_restaurant
+- intent: ask_recent_friends
   examples: |
-    - where can I eat?
-    - suggest a restaurant
-    - find me a place to eat
-    - what restaurants are nearby?
-    - where should I go for dinner?
-    - can you recommend a restaurant?
-    - I'm hungry, where should I go?
-    - looking for a place to eat
-    - what's a good restaurant around here?
-    - where's the best place to eat?
+    - who are my recent friends?
+    - show me my latest connections
+    - who did I recently befriend?
+    - what are my recent friendships?
+    - show my latest friend additions
+    - who are my newest friends?
+    - what recent friends do I have?
+    - show me my latest friend list
+    - who did I connect with recently?
+    - what are my new connections?
+    - who are my most recent friends?
+    - show my latest friend requests
+    - who did I add recently?
+    - what's my recent friend activity?
+    - show me my newest connections
+    - who are my latest friends?
+    - what recent friends have I made?
+    - show my recent friend additions
+    - who did I befriend lately?
+    - tell me about my recent friends
+
+- intent: ask_last_week_posts
+  examples: |
+    - what did I post last week?
+    - show my posts from last week
+    - what are my recent posts?
+    - show my last week's activity
+    - what posts did I make last week?
+    - show my posts from the past week
+    - what did I post in the last 7 days?
+    - show my recent post history
+    - what are my posts from last week?
+    - show my last week's content
+    - what did I post recently?
+    - show my posts from the past 7 days
+    - what's my last week's posting activity?
+    - show my recent post activity
+    - what posts did I make recently?
+    - show my last week's posts
+    - what did I post in the past week?
+    - show my recent posting history
+    - what are my latest posts?
+    - tell me about my last week's posts
+
+- intent: ask_top_posts
+  examples: |
+    - what are my top posts?
+    - show my best performing posts
+    - what are my most successful posts?
+    - show my highest rated posts
+    - what posts got the most engagement?
+    - show my most popular posts
+    - what are my best posts?
+    - show my top performing content
+    - what posts received most likes?
+    - show my most engaging posts
+    - what are my highest rated posts?
+    - show my best content
+    - what posts got the most reactions?
+    - show my most successful content
+    - what are my top performing posts?
+    - show my highest engaged posts
+    - what posts are most popular?
+    - show my best rated posts
+    - what are my most viral posts?
+    - tell me about my top posts
+
+- intent: ask_monthly_posts
+  examples: |
+    - what did I post this month?
+    - show my posts from this month
+    - what are my monthly posts?
+    - show my current month's activity
+    - what posts did I make this month?
+    - show my posts from this month
+    - what did I post in the current month?
+    - show my monthly post history
+    - what are my posts from this month?
+    - show my current month's content
+    - what did I post this month?
+    - show my posts from the current month
+    - what's my monthly posting activity?
+    - show my current month's activity
+    - what posts did I make this month?
+    - show my monthly posts
+    - what did I post in the current month?
+    - show my monthly posting history
+    - what are my current month's posts?
+    - tell me about my monthly posts
+
+- intent: ask_most_commented_post
+  examples: |
+    - what's my most commented post?
+    - which post has the most comments?
+    - show me my most discussed post
+    - what post received the most comments?
+    - which of my posts has most comments?
+    - what's my highest commented post?
+    - show my most commented content
+    - which post has the most discussions?
+    - what's my most engaging post by comments?
+    - show me my most commented on post
+    - what post got the most comments?
+    - which post is most discussed?
+    - what's my top commented post?
+    - show me my most discussed content
+    - which post received highest comments?
+    - what's my most commented on post?
+    - show my highest commented post
+    - which post has highest comment count?
+    - what's my most interactive post?
+    - tell me about my most commented post
+
+- intent: ask_profile_info
+  examples: |
+    - what's my profile information?
+    - show me my profile details
+    - what's in my profile?
+    - show my profile information
+    - what are my profile details?
+    - show me my bio
+    - what's my profile like?
+    - show my profile data
+    - what information is in my profile?
+    - show my profile content
+    - what's my profile about?
+    - show me my profile summary
+    - what details are in my profile?
+    - show my profile overview
+    - what's my profile description?
+    - show me my profile details
+    - what information do I have in my profile?
+    - show my profile information
+    - what's my profile content?
+    - tell me about my profile
+
+- intent: ask_most_active_month
+  examples: |
+    - when was I most active?
+    - what's my most active month?
+    - which month did I post the most?
+    - show my most active period
+    - when did I post the most?
+    - what month was I most active?
+    - show my highest activity month
+    - which month had most posts?
+    - what's my busiest posting month?
+    - show my most productive month
+    - when was my highest activity?
+    - what month had most content?
+    - show my peak activity month
+    - which month was most active?
+    - what's my highest posting month?
+    - show my most active posting period
+    - when did I post the most content?
+    - what month had highest activity?
+    - show my most engaged month
+    - tell me about my most active month
 
 - intent: out_of_scope
   examples: |
