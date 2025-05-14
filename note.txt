@@ -13,20 +13,29 @@ pip install rasa requests
 rasa init
 (rasa train)
 
-# Terminal 1
-rasa run --enable-api --cors "*" --port 5005
-
-# Terminal 2
-rasa run actions --port 5055
-
-#Terminal 3 (for checking)
-curl http://localhost:5005/status
+====== start server for AI
+(check Ollama)
+curl http://localhost:11434/api/tags
+#Terminal 1 (if Ollama have not run yet)
+ollama serve
 
 #start mongo in specific port
 mongod --port 27018 --dbpath "C:\data\db"
 
+# Terminal 2(rasa-env)
+rasa run --enable-api --cors "*" --port 5005
 
- /users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
+# Terminal 3(rasa-env)
+rasa run actions --port 5055
+
+#Terminal 4 (for checking)
+curl http://localhost:5005/status
+
+
+
+
+
+/users* matches /users and /users/ but not deeply nested paths like /users/abc/def. For full coverage, use both /users and /users/**.
 
 /users* matches /users, /users/, /users123, etc.
 

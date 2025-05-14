@@ -28,4 +28,10 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Integer>
     // Find friendship by two user IDs (regardless of order)
     @Query("SELECT f FROM Friendship f WHERE (f.user1.id = :userId1 AND f.user2.id = :userId2) OR (f.user1.id = :userId2 AND f.user2.id = :userId1)")
     Optional<Friendship> findByUserIds(@Param("userId1") Integer userId1, @Param("userId2") Integer userId2);
+
+    @Query("SELECT COUNT(f) FROM Friendship f WHERE (f.user1.id = :userId OR f.user2.id = :userId) AND f.status = 'ACCEPTED'")
+    Long countFriendsByUserId(Integer userId);
+    
+    @Query("SELECT f FROM Friendship f WHERE (f.user1.id = :userId OR f.user2.id = :userId) AND f.status = 'ACCEPTED' ORDER BY f.createdAt DESC")
+    List<Friendship> findRecentFriendships(Integer userId);
 }

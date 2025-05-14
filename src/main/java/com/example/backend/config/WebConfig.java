@@ -8,6 +8,7 @@ import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
@@ -17,16 +18,18 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
         
-        // Allow specific origins for better security
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // Set to true when allowing specific origins
-        configuration.setMaxAge(3600L);
-
-        source.registerCorsConfiguration("/**", configuration);
+        // Allow all origins
+        config.addAllowedOrigin("*");
+        // Allow all HTTP methods
+        config.addAllowedMethod("*");
+        // Allow all headers
+        config.addAllowedHeader("*");
+        // Allow credentials
+        config.setAllowCredentials(true);
+        
+        source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 
@@ -42,5 +45,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*");
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 } 

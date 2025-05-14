@@ -12,37 +12,87 @@ rules:
   - intent: bot_challenge
   - action: utter_iamabot
 
-- rule: Respond to weather questions
-  steps:
-  - intent: ask_weather
-  - action: utter_weather
-
-- rule: Provide restaurant recommendations
-  steps:
-  - intent: restaurant_recommendation
-  - action: utter_restaurant
-
 - rule: Offer help when requested
   steps:
   - intent: help_request
   - action: utter_help
 
-- rule: Provide post count when asked
+- rule: Handle post count questions
   steps:
   - intent: ask_post_count
-  - action: utter_post_count
+  - action: action_handle_post_count
 
-- rule: Provide friend count when asked
+- rule: Handle friend count questions
   steps:
   - intent: ask_friend_count
-  - action: utter_friend_count
+  - action: action_handle_friend_count
 
-- rule: Use Ollama for restaurant recommendations
+- rule: Handle likes received questions
   steps:
-  - intent: restaurant_recommendation
-  - action: action_ask_ollama
+  - intent: ask_likes_received
+  - action: action_handle_likes_received
+
+- rule: Handle comments written questions
+  steps:
+  - intent: ask_comments_written
+  - action: action_handle_comments_written
+
+- rule: Handle last post questions
+  steps:
+  - intent: ask_last_post
+  - action: action_handle_last_post
+
+- rule: Handle most liked post questions
+  steps:
+  - intent: ask_most_liked_post
+  - action: action_handle_most_liked_post
+
+- rule: Handle recent friends questions
+  steps:
+  - intent: ask_recent_friends
+  - action: action_handle_recent_friends
+
+- rule: Handle last week posts questions
+  steps:
+  - intent: ask_last_week_posts
+  - action: action_handle_last_week_posts
+
+- rule: Handle top posts questions
+  steps:
+  - intent: ask_top_posts
+  - action: action_handle_top_posts
+
+- rule: Handle monthly posts questions
+  steps:
+  - intent: ask_monthly_posts
+  - action: action_handle_monthly_posts
+
+- rule: Handle most commented post questions
+  steps:
+  - intent: ask_most_commented_post
+  - action: action_handle_most_commented_post
+
+- rule: Handle profile info questions
+  steps:
+  - intent: ask_profile_info
+  - action: action_handle_profile_info
+
+- rule: Handle most active month questions
+  steps:
+  - intent: ask_most_active_month
+  - action: action_handle_most_active_month
 
 - rule: Use Ollama for weather questions
   steps:
   - intent: ask_weather
-  - action: action_ask_ollama
+  - action: action_ollama_fallback
+
+- rule: Use Ollama for restaurant recommendations
+  steps:
+  - intent: restaurant_recommendation
+  - action: action_ollama_fallback
+
+- rule: Use Ollama for unknown intents
+  steps:
+  - intent: out_of_scope
+  - action: action_ollama_fallback
