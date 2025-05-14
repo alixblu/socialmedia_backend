@@ -15,6 +15,7 @@ intents:
   - ask_friend_count
   - ask_restaurant
   - out_of_scope
+  - general_question
 
 responses:
   utter_greet:
@@ -47,9 +48,9 @@ responses:
   - text: "I wish I could taste food! For the best recommendations, consider your favorite cuisine and check local reviews."
 
   utter_help:
-  - text: "I can help with greetings, chat about your mood, recommend restaurants, or discuss weather. Just ask me anything!"
-  - text: "I'm your friendly assistant. Try asking me about your day, restaurants, weather, or just say hi!"
-  - text: "Need help? I can respond to greetings, talk about your mood, or give simple recommendations. What would you like to know?"
+  - text: "I can help with greetings, chat about your mood, or discuss general topics. Just ask me anything!"
+  - text: "I'm your friendly assistant. Try asking me about your day or just say hi!"
+  - text: "Need help? I can respond to greetings and talk about your mood. What would you like to know?"
 
   utter_post_count:
   - text: "You currently have 24 posts in the database. Your most active posting month was March!"
@@ -65,8 +66,8 @@ responses:
   - text: "I'm not sure I understand. Let me try to help you with that using my language model."
 
 actions:
-  - action_ask_ollama
   - action_ollama_fallback
+  - action_ask_ollama
 
 session_config:
   session_expiration_time: 60

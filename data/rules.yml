@@ -12,37 +12,37 @@ rules:
   - intent: bot_challenge
   - action: utter_iamabot
 
-- rule: Respond to weather questions
-  steps:
-  - intent: ask_weather
-  - action: utter_weather
-
-- rule: Provide restaurant recommendations
-  steps:
-  - intent: restaurant_recommendation
-  - action: utter_restaurant
-
 - rule: Offer help when requested
   steps:
   - intent: help_request
   - action: utter_help
 
-- rule: Provide post count when asked
+- rule: Use Ollama for weather questions
   steps:
-  - intent: ask_post_count
-  - action: utter_post_count
+  - intent: ask_weather
+  - action: action_ollama_fallback
 
-- rule: Provide friend count when asked
+- rule: Use Ollama for restaurant questions
   steps:
-  - intent: ask_friend_count
-  - action: utter_friend_count
+  - intent: ask_restaurant
+  - action: action_ollama_fallback
 
 - rule: Use Ollama for restaurant recommendations
   steps:
   - intent: restaurant_recommendation
-  - action: action_ask_ollama
+  - action: action_ollama_fallback
 
-- rule: Use Ollama for weather questions
+- rule: Use Ollama for post count
   steps:
-  - intent: ask_weather
-  - action: action_ask_ollama
+  - intent: ask_post_count
+  - action: action_ollama_fallback
+
+- rule: Use Ollama for friend count
+  steps:
+  - intent: ask_friend_count
+  - action: action_ollama_fallback
+
+- rule: Use Ollama for unknown intents
+  steps:
+  - intent: out_of_scope
+  - action: action_ollama_fallback

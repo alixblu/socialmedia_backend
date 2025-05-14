@@ -154,3 +154,29 @@ nlu:
     - show my friend list count
     - how many friend requests were accepted?
     - total friends in my network
+
+- intent: ask_restaurant
+  examples: |
+    - where can I eat?
+    - suggest a restaurant
+    - find me a place to eat
+    - what restaurants are nearby?
+    - where should I go for dinner?
+    - can you recommend a restaurant?
+    - I'm hungry, where should I go?
+    - looking for a place to eat
+    - what's a good restaurant around here?
+    - where's the best place to eat?
+
+- intent: out_of_scope
+  examples: |
+    - I want to order a pizza
+    - What's the meaning of life?
+    - Tell me a joke
+    - What's your favorite color?
+    - Can you help me with my homework?
+    - What's the capital of France?
+    - How do I make a cake?
+    - What's the best way to learn programming?
+    - Can you write a poem?
+    - What's the weather like on Mars?

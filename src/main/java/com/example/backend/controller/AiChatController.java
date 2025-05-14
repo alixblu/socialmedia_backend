@@ -1,155 +1,111 @@
 package com.example.backend.controller;
 
-import com.example.backend.model.AiBot;
 import com.example.backend.model.AiChatMessage;
+import com.example.backend.service.OllamaService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClientException;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import jakarta.annotation.PostConstruct;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/ai")
 public class AiChatController {
+    private static final Logger logger = LoggerFactory.getLogger(AiChatController.class);
 
-
+    @Autowired
+    private OllamaService ollamaService;
 
     @Autowired
     private RestTemplate restTemplate;
-    
-    private final String statsBaseUrl = "http://localhost:8080/api/stats";
 
-    @PostMapping("/chat")
-    public ResponseEntity<AiChatMessage> handleChat(@RequestBody AiChatMessage message) {
-        // Save the incoming message
-        message.setTimestamp(java.time.LocalDateTime.now());
+    private static final String RASA_API_URL = "http://localhost:5005/webhooks/rest/webhook";
+    private static final int TIMEOUT = 5000; // 5 seconds timeout
 
-        // Process the message and determine intent
-        String intent = determineIntent(message.getMessage());
-        message.setIntent(intent);
-        
-        // Get response based on intent
-        String response = generateResponse(message);
-        message.setResponse(response);
-        
-        // Save the response
-
-        return ResponseEntity.ok(message);
+    @PostConstruct
+    public void init() {
+        logger.info("AiChatController initialized with endpoint: /api/ai/rasa/chat");
     }
-    
-    private String determineIntent(String message) {
-        // Simple intent detection based on keywords
-        message = message.toLowerCase();
-        
-        if (message.contains("how many posts") || message.contains("post count")) {
-            return "post_count";
-        } else if (message.contains("last post") || message.contains("when did i post")) {
-            return "last_post";
-        } else if (message.contains("last week") || message.contains("recent posts")) {
-            return "last_week_posts";
-        } else if (message.contains("top posts") || message.contains("best posts")) {
-            return "top_posts";
-        } else if (message.contains("this month") || message.contains("monthly posts")) {
-            return "monthly_posts";
-        } else if (message.contains("most active") || message.contains("active month")) {
-            return "most_active_month";
-        } else if (message.contains("likes received") || message.contains("total likes")) {
-            return "likes_received";
-        } else if (message.contains("most liked") || message.contains("best liked")) {
-            return "most_liked_post";
-        } else if (message.contains("comments written") || message.contains("total comments")) {
-            return "comments_written";
-        } else if (message.contains("most comments") || message.contains("commented post")) {
-            return "most_commented_post";
-        } else if (message.contains("how many friends") || message.contains("friend count")) {
-            return "friend_count";
-        } else if (message.contains("recent friends") || message.contains("new friends")) {
-            return "recent_friends";
-        } else if (message.contains("my bio") || message.contains("about me")) {
-            return "user_bio";
-        } else if (message.contains("when did i join") || message.contains("join date")) {
-            return "join_date";
-        }
-        
-        return "unknown";
-    }
-    
-    private String generateResponse(AiChatMessage message) {
-        String userId = message.getUserId();
-        String intent = message.getIntent();
-        
+
+    @PostMapping("/rasa/chat")
+    public ResponseEntity<Map<String, Object>> handleChat(@RequestBody Map<String, Object> request) {
+        logger.info("Received chat request: {}", request);
         try {
-            switch (intent) {
-                case "post_count":
-                    Long postCount = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/post-count", Long.class);
-                    return "You have made " + postCount + " posts.";
-                    
-                case "last_post":
-                    Map<String, Object> lastPost = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/last-post", Map.class);
-                    return "Your last post was: " + lastPost.get("content");
-                    
-                case "last_week_posts":
-                    Object[] lastWeekPosts = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/last-week-posts", Object[].class);
-                    return "You made " + lastWeekPosts.length + " posts last week.";
-                    
-                case "top_posts":
-                    Object[] topPosts = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/top-posts", Object[].class);
-                    return "Here are your top " + Math.min(3, topPosts.length) + " posts.";
-                    
-                case "monthly_posts":
-                    Object[] monthlyPosts = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/monthly-posts", Object[].class);
-                    return "You have made " + monthlyPosts.length + " posts this month.";
-                    
-                case "most_active_month":
-                    Map<String, Object> activeMonth = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/most-active-month", Map.class);
-                    return "Your most active posting month was " + getMonthName((Integer)activeMonth.get("month")) + 
-                           " with " + activeMonth.get("count") + " posts!";
-                    
-                case "likes_received":
-                    Long likesCount = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/likes-received", Long.class);
-                    return "You have received " + likesCount + " likes in total.";
-                    
-                case "most_liked_post":
-                    Map<String, Object> mostLiked = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/most-liked-post", Map.class);
-                    return "Your most liked post has " + mostLiked.get("likes") + " likes.";
-                    
-                case "comments_written":
-                    Long commentsCount = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/comments-written", Long.class);
-                    return "You have written " + commentsCount + " comments.";
-                    
-                case "most_commented_post":
-                    Map<String, Object> mostCommented = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/most-commented-post", Map.class);
-                    return "Your post with the most comments has " + mostCommented.get("comments") + " comments.";
-                    
-                case "friend_count":
-                    Long friendCount = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/friend-count", Long.class);
-                    return "You have " + friendCount + " friends.";
-                    
-                case "recent_friends":
-                    Object[] recentFriends = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/recent-friends", Object[].class);
-                    return "You have " + recentFriends.length + " recent friend connections.";
-                    
-                case "user_bio":
-                    Map<String, Object> profile = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/profile", Map.class);
-                    return "Your bio: " + profile.get("bio");
-                    
-                case "join_date":
-                    profile = restTemplate.getForObject(statsBaseUrl + "/user/" + userId + "/profile", Map.class);
-                    return "You joined on " + profile.get("joinDate");
-                    
-                default:
-                    return "I'm not sure how to help with that. Try asking about your posts, likes, comments, or friends.";
+            Integer userId = (Integer) request.get("userId");
+            String message = (String) request.get("message");
+            String botId = (String) request.get("botId");
+
+            if (userId == null || message == null) {
+                logger.error("Missing required fields: userId or message");
+                return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Missing required fields: userId or message"
+                ));
             }
+
+            // Configure timeout
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            factory.setConnectTimeout(TIMEOUT);
+            factory.setReadTimeout(TIMEOUT);
+            restTemplate.setRequestFactory(factory);
+
+            // First try Ollama for general conversation
+            logger.info("Attempting to use Ollama for general conversation");
+            String response = ollamaService.generateResponse(message);
+
+            // Then try Rasa for specific intents
+            try {
+                logger.info("Attempting to connect to Rasa for specific intents");
+                Map<String, Object> rasaRequest = new HashMap<>();
+                rasaRequest.put("sender", userId.toString());
+                rasaRequest.put("message", message);
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<Map<String, Object>> rasaEntity = new HttpEntity<>(rasaRequest, headers);
+
+                ResponseEntity<Map[]> rasaResponse = restTemplate.postForEntity(
+                    RASA_API_URL,
+                    rasaEntity,
+                    Map[].class
+                );
+                logger.info("Rasa response status: {}", rasaResponse.getStatusCode());
+                logger.info("Rasa response body: {}", rasaResponse.getBody());
+
+                if (rasaResponse.getStatusCode() == HttpStatus.OK && rasaResponse.getBody() != null && rasaResponse.getBody().length > 0) {
+                    // Use Rasa's response if it has one
+                    Map<String, Object> rasaMessage = rasaResponse.getBody()[0];
+                    String rasaText = (String) rasaMessage.get("text");
+                    if (rasaText != null && !rasaText.isEmpty()) {
+                        logger.info("Using Rasa response: {}", rasaText);
+                        response = "Rasa: " + rasaText;
+                    }
+                }
+            } catch (RestClientException e) {
+                logger.error("Error connecting to Rasa: {}", e.getMessage(), e);
+                // Continue with Ollama response if Rasa fails
+            }
+
+            // Create response object
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("userId", userId);
+            responseMap.put("botId", botId);
+            responseMap.put("content", response);
+            responseMap.put("timestamp", LocalDateTime.now());
+
+            return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
-            return "I'm having trouble accessing that information right now. Please try again later.";
+            logger.error("Unexpected error: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().body(Map.of(
+                "error", "An unexpected error occurred. Please try again."
+            ));
         }
-    }
-    
-    private String getMonthName(int month) {
-        String[] months = {"January", "February", "March", "April", "May", "June", 
-                          "July", "August", "September", "October", "November", "December"};
-        return months[month - 1];
     }
 } 
