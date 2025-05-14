@@ -38,7 +38,20 @@ public class UserController {
     @GetMapping("{id}")
     public User getUserById(@PathVariable Integer id) {
         return userRepository.findById(id).orElse(null);
+    }   
+
+
+    @GetMapping("/username/id/{id}")
+    public ResponseEntity<String> getUserNameById(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user != null) {
+            return ResponseEntity.ok(user.getUsername());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
     }
+
 
     @PostMapping
     public User createUser(@RequestBody User user) {

@@ -32,4 +32,8 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = true) // Cho phép null
+    private Post post;
 }

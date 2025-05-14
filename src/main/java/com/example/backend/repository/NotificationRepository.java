@@ -1,6 +1,8 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.Notification;
+import com.example.backend.model.NotificationType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     // Find all unread notifications
     List<Notification> findByStatus(String status);
+
+    boolean existsByUserIdAndPostIdAndType(Integer userId, Integer postId, NotificationType type);
+
 }
