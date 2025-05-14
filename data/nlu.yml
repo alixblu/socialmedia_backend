@@ -141,6 +141,16 @@ nlu:
     - total posts in database
     - how active have I been posting?
     - show my posting activity
+    - how many post i made
+    - how many posts did i make
+    - what's my post count
+    - how many posts are in my account
+    - can you tell me how many posts i have
+    - i want to know my post count
+    - show me my total posts
+    - how many posts have i created
+    - what's the total number of my posts
+    - count all my posts
 
 - intent: ask_friend_count
   examples: |

@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -27,10 +28,13 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Integer> {
     @Transactional
     void deleteByPostId(Integer postId);
 
+    @Query("SELECT COUNT(pl) FROM PostLike pl WHERE pl.post.id = :postId")
+    Long countLikesByPostId(@Param("postId") Integer postId);
+
     @Query("SELECT COUNT(pl) FROM PostLike pl WHERE pl.post.user.id = :userId")
-    Long countTotalLikesReceived(Integer userId);
+    Long countTotalLikesReceived(@Param("userId") Integer userId);
     
     @Query("SELECT p FROM Post p WHERE p.user.id = :userId ORDER BY (SELECT COUNT(pl) FROM PostLike pl WHERE pl.post = p) DESC")
-    List<Post> findMostLikedPost(Integer userId);
+    List<Post> findMostLikedPost(@Param("userId") Integer userId);
 
 }

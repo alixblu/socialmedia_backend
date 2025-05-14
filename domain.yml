@@ -52,22 +52,11 @@ responses:
   - text: "I'm your friendly assistant. Try asking me about your day or just say hi!"
   - text: "Need help? I can respond to greetings and talk about your mood. What would you like to know?"
 
-  utter_post_count:
-  - text: "You currently have 24 posts in the database. Your most active posting month was March!"
-  - text: "I checked your account and found 24 posts. You've been quite active recently!"
-  - text: "According to the database, you have created 24 posts in total. Keep up the good work!"
-
-  utter_friend_count:
-  - text: "You have accepted 15 friend requests so far. You're building a nice network!"
-  - text: "Your friend count currently stands at 15 accepted connections."
-  - text: "The database shows you've connected with 15 friends. Your social circle is growing!"
-
-  utter_out_of_scope:
-  - text: "I'm not sure I understand. Let me try to help you with that using my language model."
-
 actions:
   - action_ollama_fallback
   - action_ask_ollama
+  - action_handle_post_count
+  - action_handle_friend_count
 
 session_config:
   session_expiration_time: 60

@@ -25,7 +25,7 @@ public class OllamaService {
 
     private static final String OLLAMA_API_URL = "http://localhost:11434/api/generate";
     private static final String MODEL = "phi";
-    private static final int TIMEOUT = 10000; // Increased timeout to 10 seconds
+    private static final int TIMEOUT = 10000; // 10 seconds timeout
 
     public String generateResponse(String userMessage) {
         try {
@@ -69,10 +69,10 @@ public class OllamaService {
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null && response.getBody().containsKey("response")) {
                 String ollamaResponse = (String) response.getBody().get("response");
                 logger.info("Successfully extracted response: {}", ollamaResponse);
-                return ollamaResponse;
+                return "Phi: " + ollamaResponse;
             } else {
                 logger.error("Invalid response from Ollama: {}", response.getBody());
-                return "I'm having trouble generating a response. Please try again.";
+                return "Phi: I'm having trouble generating a response. Please try again.";
             }
         } catch (RestClientException e) {
             logger.error("Error connecting to Ollama: {}", e.getMessage(), e);
@@ -80,14 +80,14 @@ public class OllamaService {
             try {
                 ResponseEntity<String> healthCheck = restTemplate.getForEntity("http://localhost:11434/api/tags", String.class);
                 logger.info("Ollama health check response: {}", healthCheck.getStatusCode());
-                return "Error connecting to AI service. Please make sure Ollama is running.";
+                return "Phi: Error connecting to AI service. Please make sure Ollama is running.";
             } catch (Exception ex) {
                 logger.error("Ollama health check failed: {}", ex.getMessage(), ex);
-                return "Error connecting to AI service. Please make sure Ollama is running and accessible at http://localhost:11434";
+                return "Phi: Error connecting to AI service. Please make sure Ollama is running and accessible at http://localhost:11434";
             }
         } catch (Exception e) {
             logger.error("Unexpected error in Ollama service: {}", e.getMessage(), e);
-            return "An unexpected error occurred. Please try again.";
+            return "Phi: An unexpected error occurred. Please try again.";
         }
     }
 } 
