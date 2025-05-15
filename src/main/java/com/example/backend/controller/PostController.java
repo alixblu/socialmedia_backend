@@ -2,6 +2,8 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Post;
 import com.example.backend.model.User;
+import com.example.backend.model.ReportStatus;
+import com.example.backend.dto.ReportedPostDTO;
 import com.example.backend.repository.PostRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.PostLikeRepository;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/posts")
@@ -141,6 +144,69 @@ public class PostController {
             return ResponseEntity.ok("Post deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deleting post: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/reported")
+    public ResponseEntity<?> getReportedPosts() {
+        try {
+            List<Post> reportedPosts = postRepository.findByReportsStatus(ReportStatus.PENDING);
+            
+            List<ReportedPostDTO> dtoList = reportedPosts.stream().map(post -> {
+                ReportedPostDTO dto = new ReportedPostDTO();
+                dto.setId(post.getId());
+                dto.setContent(post.getContent());
+                dto.setMediaUrls(post.getMediaUrls());
+                dto.setUsername(post.getUser().getUsername());
+                dto.setAvatarUrl(post.getUser().getAvatarUrl());
+                dto.setCreatedAt(post.getCreatedAt());
+                dto.setHidden(post.isHidden());
+                
+                // Map reports
+                dto.setReports(post.getReports().stream()
+                    .map(report -> {
+                        ReportedPostDTO.ReportDTO reportDTO = new ReportedPostDTO.ReportDTO();
+                        reportDTO.setId(report.getId());
+                        reportDTO.setUsername(report.getUser().getUsername());
+                        reportDTO.setReason(report.getReason().toString());
+                        reportDTO.setStatus(report.getStatus().toString());
+                        reportDTO.setCreatedAt(report.getCreatedAt());
+                        return reportDTO;
+                    })
+                    .collect(Collectors.toList()));
+                
+                return dto;
+            }).collect(Collectors.toList());
+
+            return ResponseEntity.ok(dtoList);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error fetching reported posts: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/hide")
+    public ResponseEntity<?> hidePost(@PathVariable Integer id) {
+        try {
+            Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
+            post.setHidden(true);
+            Post updatedPost = postRepository.save(post);
+            return ResponseEntity.ok(updatedPost);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error hiding post: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{id}/unhide")
+    public ResponseEntity<?> unhidePost(@PathVariable Integer id) {
+        try {
+            Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Post not found"));
+            post.setHidden(false);
+            Post updatedPost = postRepository.save(post);
+            return ResponseEntity.ok(updatedPost);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error unhiding post: " + e.getMessage());
         }
     }
 

@@ -1,6 +1,8 @@
 package com.example.backend.repository;
 
 import com.example.backend.model.Post;
+import com.example.backend.model.Report;
+import com.example.backend.model.ReportStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,6 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     // Search posts by content (case insensitive)
     List<Post> findByContentContainingIgnoreCase(String keyword);
 
+    @Query("SELECT p FROM Post p WHERE p.isHidden = false ORDER BY p.createdAt DESC")
     List<Post> findAllByOrderByCreatedAtDesc();
     
     @Query("SELECT COUNT(p) FROM Post p WHERE p.user.id = :userId")
@@ -40,4 +43,12 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     
     @Query("SELECT FUNCTION('MONTH', p.createdAt) as month, COUNT(p) as count FROM Post p WHERE p.user.id = :userId GROUP BY FUNCTION('MONTH', p.createdAt) ORDER BY count DESC")
     List<Object[]> findMostActiveMonth(Integer userId);
+
+    @Query("SELECT DISTINCT p FROM Post p JOIN p.reports r WHERE r.status = :status")
+    List<Post> findByReportsStatus(ReportStatus status);
+
+    List<Post> findByIsHiddenTrue();
+
+    @Query("SELECT p FROM Post p WHERE p.isHidden = false")
+    List<Post> findAllVisible();
 }

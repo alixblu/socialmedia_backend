@@ -1,6 +1,7 @@
 package com.example.backend.security;
 
 import com.example.backend.model.User;
+import com.example.backend.model.UserStatus;
 import com.example.backend.repository.UserRepository;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -36,6 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 
                 User user = userRepository.findByEmail(email);
                 if (user != null) {
+                    // Check if user is active
+                    if (user.getStatus() != UserStatus.ACTIVE) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().write("Tài khoản của bạn đã bị khóa hoặc không hoạt động.");
+                        return;
+                    }
+                    
                     UsernamePasswordAuthenticationToken authentication = 
                         new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
                     SecurityContextHolder.getContext().setAuthentication(authentication);

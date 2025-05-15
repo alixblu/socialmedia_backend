@@ -135,31 +135,9 @@ The project uses a dual database architecture:
   ```
 - The backend will connect to Ollama locally to generate AI responses using the TinyLlama model.
 
-#### 4. Configure Spring Boot for Rasa and Ollama
-- Run the backend with the Rasa profile:
-  ```
-  mvn spring-boot:run -Dspring-boot.run.profiles=rasa
-  ```
-- Edit `application-rasa.properties` as needed:
-  ```
-  rasa.url=http://localhost:5005
-  rasa.model=default
-  rasa.timeout=10000
-  ollama.url=http://localhost:11434
-  ollama.model=tinyllama
-  ```
 
 ## AWS S3 Configuration
-- The backend uses AWS S3 for file and image storage
-- Required AWS S3 configuration in `application.properties`:
-  ```properties
-  # AWS S3 Configuration
-  aws.s3.bucket-name=your-bucket-name
-  aws.s3.region=your-region
-  aws.s3.access-key=your-access-key
-  aws.s3.secret-key=your-secret-key
-  ```
-- Alternatively, you can set these as environment variables:
+- Create .env file, then set these as environment variables:
   ```
   AWS_S3_BUCKET_NAME=your-bucket-name
   AWS_S3_REGION=your-region
