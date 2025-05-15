@@ -3,6 +3,8 @@ package com.example.backend.repository;
 import com.example.backend.model.Notification;
 import com.example.backend.model.NotificationType;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,5 +20,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByStatus(String status);
 
     boolean existsByUserIdAndPostIdAndType(Integer userId, Integer postId, NotificationType type);
+
+    @Transactional
+    void deleteByPostId(Integer postId);
 
 }

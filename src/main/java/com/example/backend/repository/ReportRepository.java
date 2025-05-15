@@ -2,6 +2,9 @@ package com.example.backend.repository;
 
 
 import com.example.backend.model.Report;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +18,7 @@ public interface ReportRepository extends JpaRepository<Report, Integer> {
 
     // Find reports by status
     List<Report> findByStatus(String status);
+        
+    @Transactional
+    void deleteByPostId(Integer postId);
 }

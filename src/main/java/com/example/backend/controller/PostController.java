@@ -7,6 +7,9 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.repository.PostLikeRepository;
 import com.example.backend.repository.PostShareRepository;
 import com.example.backend.repository.CommentRepository;
+import com.example.backend.repository.NotificationRepository;
+import com.example.backend.repository.ReportRepository;
+
 import com.example.backend.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +41,12 @@ public class PostController {
     
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private NotificationRepository notificationRepository;
+    
+    @Autowired
+    private ReportRepository reportRepository;
 
     @Autowired
     private S3Service s3Service;
@@ -131,10 +140,12 @@ public class PostController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deletePost(@PathVariable Integer id) {
         try {
-            // Xóa tất cả like liên quan đến bài viết
+
             postLikeRepository.deleteByPostId(id);
             commentRepository.deleteByPostId(id);
             postShareRepository.deleteByPostId(id);
+            notificationRepository.deleteByPostId(id);
+            reportRepository.deleteByPostId(id);
             postRepository.deleteById(id);
 
 

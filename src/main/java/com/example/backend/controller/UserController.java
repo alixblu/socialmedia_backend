@@ -7,6 +7,8 @@ import com.example.backend.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,9 +28,16 @@ import com.example.backend.dto.StatusDTO;
 @CrossOrigin(origins = "http://localhost:5173")
 
 public class UserController {
+    
+    private Map<String, String> otpStorage = new HashMap<>(); // email -> otp
+
+    @Autowired  
+    private UserRepository userRepository;
+
 
     @Autowired
-    private UserRepository userRepository;
+    private JavaMailSender mailSender;
+
 
     @GetMapping
     public List<User> getAllUsers() {
@@ -51,6 +60,85 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
+
+
+    //Hàm tạo OTP VÀ XÁC THỰC OTP
+
+    private String generateOtp() {
+        int otp = (int)(Math.random() * 900000) + 100000;
+        return String.valueOf(otp);
+    }
+
+    @PostMapping("/sendOtp")
+    public ResponseEntity<?> sendOtp(@RequestParam("email") String email) {
+        
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email không tồn tại.");
+        }
+
+        String otp = generateOtp();
+        otpStorage.put(email, otp);
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Mã xác thực OTP");
+            message.setText("Mã OTP của bạn là: " + otp + ". Vui lòng không chia sẻ mã này với bất kỳ ai.");
+            mailSender.send(message);
+
+            return ResponseEntity.ok("OTP đã được gửi tới email.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi gửi email: " + e.getMessage());
+        }
+    }
+
+
+   @PostMapping("/verifyOtp")
+    public ResponseEntity<?> verifyOtp(
+        @RequestParam("email") String email,
+        @RequestParam("otp") String inputOtp
+    ) {
+        String storedOtp = otpStorage.get(email);
+        if (storedOtp == null || !storedOtp.equals(inputOtp)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("OTP không hợp lệ hoặc đã hết hạn.");
+        }
+
+        otpStorage.remove(email);
+        return ResponseEntity.ok("Xác thực OTP thành công!");
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam("email") String email,
+            @RequestParam("newPassword") String newPassword) {
+
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email không tồn tại.");
+        }
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công!");
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @PostMapping
